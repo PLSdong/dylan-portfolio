@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>王小东 Dylan · AI 产品经理</title>
+<meta name="description" content="AI 产品经理 Dylan 的个人作品集 — 让 AI 有温度，让科技向善。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:#FAFAF7;
+    --ink:#1B2330;
+    --muted:#5B6573;
+    --hint:#8C95A2;
+    --line:rgba(27,35,48,.08);
+    --card:rgba(255,255,255,.55);
+    --glass:rgba(255,255,255,.7);
+    --accent:#FF7F4E;
+    --gold:#FFC857;
+    --aurora-1:#DCE3F0;
+    --aurora-2:#E8E0F0;
+    --aurora-3:#FFE8DA;
+  }
+  *{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:"Inter","Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    overflow-x:hidden;
+    letter-spacing:.005em;
+  }
+  /* ===== 极光背景层（极简版） ===== */
+  .aurora{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    overflow:hidden; filter:blur(80px); opacity:.55;
+  }
+  .aurora::before,
+  .aurora::after,
+  .aurora .blob{
+    content:""; position:absolute; border-radius:50%;
+    will-change:transform;
+  }
+  .aurora::before{
+    width:760px; height:760px; left:-15%; top:-20%;
+    background:radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
+    animation:floatA 32s ease-in-out infinite;
+  }
+  .aurora::after{
+    width:820px; height:820px; right:-20%; top:25%;
+    background:radial-gradient(circle, var(--aurora-2) 0%, transparent 65%);
+    animation:floatB 38s ease-in-out infinite;
+  }
+  .aurora .blob.b1{
+    width:680px; height:680px; left:35%; bottom:-10%;
+    background:radial-gradient(circle, var(--aurora-3) 0%, transparent 65%);
+    animation:floatC 42s ease-in-out infinite;
+  }
+  @keyframes floatA{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,40px)} }
+  @keyframes floatB{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,60px)} }
+  @keyframes floatC{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-50px)} }
+
+  /* ===== 玻璃卡 ===== */
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(27,35,48,.04),
+      0 8px 32px rgba(27,35,48,.06);
+    border-radius:28px;
+    position:relative;
+    overflow:hidden;
+    transition:transform .5s cubic-bezier(.2,.7,.2,1), box-shadow .5s ease;
+  }
+  /* 呼吸光效（更克制） */
+  .glass::before{
+    content:""; position:absolute; inset:-1px; border-radius:inherit;
+    background:linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,.4));
+    pointer-events:none;
+    opacity:.5;
+    animation:breath 8s ease-in-out infinite;
+  }
+  @keyframes breath{ 0%,100%{opacity:.4} 50%{opacity:.7} }
+
+  /* tvOS 同款视差倾斜 */
+  .tilt{ transform-style:preserve-3d; transition:transform .35s cubic-bezier(.2,.7,.2,1); }
+  .tilt-inner{ transform:translateZ(40px); transition:transform .35s ease; }
+  .tilt:hover{ box-shadow: 0 30px 80px rgba(27,35,48,.12), inset 0 1px 0 rgba(255,255,255,.9); }
+  .spotlight{
+    position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.55), transparent 50%);
+    opacity:0; transition:opacity .35s ease;
+    mix-blend-mode:overlay;
+  }
+  .tilt:hover .spotlight{ opacity:1; }
+
+  /* 文字与点缀 */
+  .grad-text{
+    background:linear-gradient(120deg,#1B2330 10%, #3B4658 55%, #FF7F4E 95%);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent;
+    display:inline-block;
+    padding-bottom:.18em;
+    line-height:1.15;
+  }
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px;
+    background:rgba(255,255,255,.65);
+    border:1px solid rgba(27,35,48,.08);
+    font-size:12px; color:var(--muted);
+    backdrop-filter:blur(12px);
+  }
+  .dot{ width:6px; height:6px; border-radius:50%; background:#22C55E; box-shadow:0 0 0 3px rgba(34,197,94,.2);}
+  .chip{
+    display:inline-flex; align-items:center; padding:4px 10px;
+    border-radius:8px; font-size:11px; color:var(--muted);
+    background:rgba(27,35,48,.04); border:1px solid rgba(27,35,48,.06);
+  }
+
+  /* 进入动画 */
+  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in{ opacity:1; transform:none; }
+
+  /* 数据增长 */
+  .num{ font-variant-numeric:tabular-nums; }
+
+  /* 项目展开 */
+  .proj{ cursor:pointer; }
+  .proj .detail{ max-height:0; overflow:hidden; transition:max-height .7s cubic-bezier(.2,.7,.2,1), opacity .4s ease; opacity:0;}
+  .proj.open .detail{ max-height:2400px; opacity:1; }
+  .proj .arrow{ transition:transform .4s ease; }
+  .proj.open .arrow{ transform:rotate(45deg); }
+
+  /* logo 占位 */
+  .logo-tile{
+    width:56px; height:56px; border-radius:18px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:600; font-size:14px;
+    background:linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,255,255,.55));
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,1), 0 8px 24px rgba(27,35,48,.08);
+    color:var(--ink);
+  }
+
+  /* nav */
+  .nav-glass{
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:999px;
+    box-shadow:0 4px 24px rgba(27,35,48,.06);
+  }
+  .nav-link{ padding:8px 14px; border-radius:999px; color:var(--muted); font-size:13px; transition:all .3s; }
+  .nav-link:hover{ color:var(--ink); background:rgba(27,35,48,.04); }
+
+  /* 滚动条 */
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(27,35,48,.15); border-radius:4px; }
+
+  /* 选中色 */
+  ::selection{ background:rgba(255,127,78,.25); }
+
+  /* progress bar */
+  .bar{ height:6px; border-radius:3px; background:rgba(27,35,48,.06); overflow:hidden; position:relative; }
+  .bar-fill{ height:100%; border-radius:3px; background:linear-gradient(90deg,#FF7F4E,#FFC857); width:0; transition:width 1.4s cubic-bezier(.2,.7,.2,1); }
+
+  /* Lightbox */
+  .lightbox{
+    position:fixed; inset:0; z-index:100;
+    background:rgba(15,22,35,.85);
+    backdrop-filter:blur(20px) saturate(140%);
+    -webkit-backdrop-filter:blur(20px) saturate(140%);
+    display:flex; align-items:center; justify-content:center;
+    padding:5vh 4vw;
+    opacity:0; pointer-events:none;
+    transition:opacity .35s ease;
+    cursor:zoom-out;
+  }
+  .lightbox.open{ opacity:1; pointer-events:auto; }
+  .lightbox img{
+    max-width:100%; max-height:90vh; width:auto; height:auto;
+    border-radius:16px;
+    box-shadow:0 30px 80px rgba(0,0,0,.4);
+    transform:scale(.95); transition:transform .35s cubic-bezier(.2,.7,.2,1);
+  }
+  .lightbox.open img{ transform:scale(1); }
+  .lightbox-close{
+    position:absolute; top:24px; right:24px;
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:background .25s ease;
+  }
+  .lightbox-close:hover{ background:rgba(255,255,255,.25); }
+  .lightbox-hint{
+    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+    font-size:12px; color:rgba(255,255,255,.65);
+    letter-spacing:.05em;
+  }
+
+  /* ===== Avatar 动效 ===== */
+  .avatar-wrap{
+    position:relative;
+    display:flex;
+    align-items:center; justify-content:center;
+    margin: 0 auto 32px;
+    width: 320px; height: 320px;
+    cursor:pointer;
+  }
+  .avatar-halo{
+    position:absolute; inset:-40px;
+    border-radius:50%;
+    background:conic-gradient(from 0deg, #FFD6A5, #BDB2FF, #A0C4FF, #FFC6FF, #FFD6A5);
+    filter:blur(60px);
+    opacity:.5;
+    animation:haloSpin 14s linear infinite;
+    z-index:0;
+  }
+  @keyframes haloSpin{ to{ transform:rotate(360deg); } }
+  .avatar-tile{
+    position:relative; z-index:1;
+    width:100%; height:100%;
+    background:transparent;
+    overflow:visible;
+    animation:avatarFloat 6s ease-in-out infinite;
+    transition:transform .4s cubic-bezier(.2,.7,.2,1);
+  }
+  .avatar-wrap:hover .avatar-tile{ transform:scale(1.05) rotate(-3deg); }
+  .avatar-tile img{
+    width:100%; height:100%; object-fit:contain;
+    transform-origin:center 60%;
+    mix-blend-mode:multiply;
+  }
+  .avatar-img{
+    position:absolute; inset:0;
+    transition:opacity .35s ease;
+  }
+  .avatar-default{ opacity:1; animation:avatarWiggle 5s ease-in-out infinite; }
+  .avatar-love{ opacity:0; transform:scale(.92); }
+  .avatar-wrap.loved .avatar-default{ opacity:0; }
+  .avatar-wrap.loved .avatar-love{ opacity:1; transform:scale(1); animation:lovePulse .6s cubic-bezier(.2,.7,.2,1); }
+  @keyframes lovePulse{
+    0%{ transform:scale(.85); }
+    60%{ transform:scale(1.1); }
+    100%{ transform:scale(1); }
+  }
+  @keyframes avatarFloat{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-12px); }
+  }
+  @keyframes avatarWiggle{
+    0%,40%,100%{ transform:rotate(0deg); }
+    8%{ transform:rotate(-4deg); }
+    16%{ transform:rotate(4deg); }
+    24%{ transform:rotate(-2deg); }
+    32%{ transform:rotate(0deg); }
+  }
+  /* Hi 气泡 */
+  .avatar-bubble{
+    position:absolute; right:-10px; top:30px;
+    background:#fff;
+    color:var(--ink);
+    font-size:15px; font-weight:500;
+    padding:8px 16px;
+    border-radius:18px 18px 4px 18px;
+    border:1px solid rgba(27,35,48,.08);
+    box-shadow:0 12px 28px rgba(27,35,48,.12);
+    z-index:2;
+    opacity:0;
+    transform:translate(-6px,4px) scale(.85);
+    animation:bubblePop 5s ease-in-out infinite;
+    pointer-events:none;
+    white-space:nowrap;
+  }
+  .avatar-bubble::after{
+    content:""; position:absolute; left:-1px; bottom:-6px;
+    width:10px; height:10px; background:#fff;
+    border-left:1px solid rgba(27,35,48,.08);
+    border-bottom:1px solid rgba(27,35,48,.08);
+    transform:rotate(-45deg);
+    border-radius:0 0 0 3px;
+  }
+  @keyframes bubblePop{
+    0%,8%{ opacity:0; transform:translate(-6px,4px) scale(.85); }
+    14%,26%{ opacity:1; transform:translate(0,0) scale(1); }
+    34%,100%{ opacity:0; transform:translate(4px,-2px) scale(.92); }
+  }
+
+  /* 装饰小星 */
+  .avatar-spark{
+    position:absolute;
+    width:14px; height:14px;
+    background:var(--accent);
+    clip-path:polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%);
+    opacity:.85;
+    animation:sparkTwinkle 3.5s ease-in-out infinite;
+    z-index:2;
+  }
+  .avatar-spark.s1{ top:10px; right:30px; animation-delay:.2s; }
+  .avatar-spark.s2{ bottom:40px; right:0px; width:10px; height:10px; background:var(--gold); animation-delay:1.4s; }
+  .avatar-spark.s3{ top:80px; left:10px; width:11px; height:11px; background:#A0C4FF; animation-delay:2.4s; }
+  @keyframes sparkTwinkle{
+    0%,100%{ opacity:0; transform:scale(.5) rotate(0deg); }
+    50%{ opacity:.9; transform:scale(1) rotate(20deg); }
+  }
+
+  /* 爱心飞溅 */
+  .heart-burst{
+    position:absolute; inset:0; pointer-events:none; z-index:3;
+  }
+  .heart-burst .heart{
+    position:absolute; left:50%; top:50%;
+    color:#FF4D6D;
+    font-size:24px;
+    line-height:1;
+    opacity:0;
+    transform:translate(-50%,-50%) scale(.5);
+    text-shadow:0 4px 10px rgba(255,77,109,.35);
+    pointer-events:none;
+  }
+  .avatar-wrap.loved .heart-burst .heart{
+    animation:heartFly 1.4s cubic-bezier(.18,.7,.3,1) forwards;
+  }
+  .avatar-wrap.loved .heart-burst .h1{ animation-delay:.02s; --tx:-120px; --ty:-90px; --r:-18deg; --s:1.1; }
+  .avatar-wrap.loved .heart-burst .h2{ animation-delay:.06s; --tx:120px; --ty:-100px; --r:14deg; --s:1.3; }
+  .avatar-wrap.loved .heart-burst .h3{ animation-delay:.1s; --tx:-150px; --ty:30px; --r:-8deg; --s:.9; }
+  .avatar-wrap.loved .heart-burst .h4{ animation-delay:.14s; --tx:140px; --ty:50px; --r:18deg; --s:1.0; }
+  .avatar-wrap.loved .heart-burst .h5{ animation-delay:.18s; --tx:-60px; --ty:-140px; --r:-10deg; --s:.85; }
+  .avatar-wrap.loved .heart-burst .h6{ animation-delay:.22s; --tx:70px; --ty:-150px; --r:8deg; --s:1.15; }
+  @keyframes heartFly{
+    0%{ opacity:0; transform:translate(-50%,-50%) scale(.4) rotate(0deg); }
+    20%{ opacity:1; }
+    100%{ opacity:0; transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--s,1)) rotate(var(--r,0deg)); }
+  }
+
+  @media (max-width: 900px){
+    .avatar-wrap{ width:220px; height:220px; }
+    .avatar-bubble{ font-size:13px; right:-4px; top:20px; }
+  }
+
+  /* 大标题分字进入动画 */
+  .word-pop{ display:inline-block; opacity:0; transform:translateY(20px); animation:wordPop .9s cubic-bezier(.2,.7,.2,1) forwards; }
+  .word-pop.delay-1{ animation-delay:.1s; }
+  .word-pop.delay-2{ animation-delay:.25s; }
+  @keyframes wordPop{ to{ opacity:1; transform:translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce){
+    .avatar-tile,.avatar-tile img,.avatar-bubble,.avatar-halo,.avatar-spark,.word-pop{ animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora">
+  <span class="blob b1"></span>
+</div>
+
+<!-- ============ Nav ============ -->
+<nav class="fixed top-5 left-1/2 -translate-x-1/2 z-50 nav-glass px-3 py-2 flex items-center gap-1 text-sm">
+  <span class="px-3 font-medium tracking-tight">Dylan · 王小东</span>
+  <span class="w-px h-4 bg-black/10 mx-1"></span>
+  <a href="#highlights" class="nav-link">概览</a>
+  <a href="#work" class="nav-link">AI 工作</a>
+  <a href="#social" class="nav-link">公益学术</a>
+  <a href="#about" class="nav-link">关于我</a>
+  <a href="#contact" class="nav-link">联系</a>
+</nav>
+
+<main class="relative z-10">
+
+<!-- ============ Hero ============ -->
+<section class="relative pt-36 pb-24 px-6 max-w-[1240px] mx-auto">
+  <div class="reveal text-center">
+    <div class="inline-flex items-center gap-2 pill mb-10">
+      <span class="dot"></span>
+      <span>在职 · 腾讯 QQ AI 应用产品中心 - AI 产品策划</span>
+    </div>
+
+    <div class="avatar-wrap" title="点我一下试试 ❤️" id="avatarWrap">
+      <div class="avatar-halo"></div>
+      <div class="avatar-tile">
+        <img src="assets/avatar.png" alt="Dylan 的头像" class="avatar-img avatar-default" />
+        <img src="assets/avatar-love.png" alt="Dylan 害羞表情" class="avatar-img avatar-love" />
+      </div>
+      <div class="avatar-bubble">Hi 👋</div>
+      <span class="avatar-spark s1"></span>
+      <span class="avatar-spark s2"></span>
+      <span class="avatar-spark s3"></span>
+      <div class="heart-burst" aria-hidden="true">
+        <span class="heart h1">♥</span>
+        <span class="heart h2">♥</span>
+        <span class="heart h3">♥</span>
+        <span class="heart h4">♥</span>
+        <span class="heart h5">♥</span>
+        <span class="heart h6">♥</span>
+      </div>
+    </div>
+
+    <h1 class="text-[44px] md:text-[68px] leading-[1.05] font-semibold tracking-tight">
+      <span class="text-[var(--ink)] word-pop">Hi，我是小东</span><br/>
+      <span class="grad-text word-pop delay-2">Dylan Wang.</span>
+    </h1>
+
+    <p class="mt-10 mx-auto max-w-[760px] text-[17px] md:text-[19px] text-[var(--muted)] leading-[1.85] tracking-tight text-center">
+      我相信 <b class="text-[var(--ink)] font-medium">AI 可以有温度</b>，模型的能力，能被翻译成用户能享受的小惊喜。
+      也希望<b class="text-[var(--ink)] font-medium">让科技照亮每一个人</b> — 技术的进步，最终要被普通人用到，也被边缘人群感受到。
+    </p>
+
+    <div class="mt-12 mx-auto max-w-[920px]">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-5 text-center">关于我 · About</div>
+      <div class="flex flex-wrap items-stretch justify-center gap-3">
+        <div class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/65 backdrop-blur border border-black/5">
+          <span class="text-[11px] tracking-wider uppercase text-[var(--hint)]">现就职</span>
+          <span class="w-px h-4 bg-black/10"></span>
+          <span class="text-sm text-[var(--ink)] font-medium">腾讯 · QQ AI 宠物业务 · 产品策划</span>
+        </div>
+        <div class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/65 backdrop-blur border border-black/5">
+          <span class="text-[11px] tracking-wider uppercase text-[var(--hint)]">教育背景</span>
+          <span class="w-px h-4 bg-black/10"></span>
+          <span class="text-sm text-[var(--ink)] font-medium">浙江大学 · 人机交互硕士（无障碍方向）</span>
+        </div>
+        <div class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/65 backdrop-blur border border-black/5">
+          <span class="text-[11px] tracking-wider uppercase text-[var(--hint)]">长期关注</span>
+          <span class="w-px h-4 bg-black/10"></span>
+          <span class="text-sm text-[var(--ink)] font-medium">AI 和关注边缘群体中的机会点</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-3">
+      <a href="#work" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--ink)] text-white text-sm font-medium hover:opacity-90 transition shadow-lg shadow-black/10">
+        看看我做过的项目
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="#contact" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/70 backdrop-blur border border-black/5 text-sm font-medium text-[var(--ink)] hover:bg-white transition">
+        联系我
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Highlights · 两个模块 ============ -->
+<section id="highlights" class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="grid grid-cols-12 gap-5">
+
+    <!-- 模块 1：QQ-AI 宠物业务 -->
+    <div class="col-span-12 md:col-span-7 reveal">
+      <div class="glass tilt p-8 h-full">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xs text-[var(--hint)] tracking-wider uppercase">01 / 在职业务</span>
+            <span class="chip">腾讯 · QQ AI 宠物</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 md:w-[72px] md:h-[72px] rounded-full overflow-hidden bg-white border border-black/5 flex-shrink-0" style="box-shadow:inset 0 1px 0 rgba(255,255,255,1), 0 8px 24px rgba(27,35,48,.08);">
+              <img src="assets/qqpet-logo.png" alt="QQ AI 宠物业务 Logo" class="w-full h-full object-cover block" />
+            </div>
+            <div>
+              <h3 class="text-3xl font-semibold tracking-tight leading-tight">QQ-AI 宠物业务</h3>
+              <p class="mt-1 text-sm text-[var(--muted)]">把大模型能力翻译成普通用户能感知到的产品价值。</p>
+            </div>
+          </div>
+
+          <div class="mt-7 grid grid-cols-2 gap-4">
+
+            <!-- 社交方向 -->
+            <div class="rounded-2xl bg-white/65 border border-black/5 p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-7 h-7 rounded-xl bg-[#EDF1F5] text-[#4A6378] text-xs flex items-center justify-center font-medium">社</span>
+                <span class="text-xs text-[var(--hint)] tracking-wider uppercase">社交</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="num text-[56px] font-semibold leading-none" data-target="85">0</span>
+                <span class="text-2xl font-semibold text-[var(--accent)]">%</span>
+              </div>
+              <div class="mt-1 text-xs text-[var(--hint)]">客态主页 PV 相对提升</div>
+              <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">策划异步社交玩法，激活 QQ 关系链价值。</p>
+              <div class="bar mt-4"><div class="bar-fill" data-w="92"></div></div>
+            </div>
+
+            <!-- AI 方向 -->
+            <div class="rounded-2xl bg-white/65 border border-black/5 p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-7 h-7 rounded-xl bg-[#F4EBE3] text-[var(--accent)] text-xs flex items-center justify-center font-medium">AI</span>
+                <span class="text-xs text-[var(--hint)] tracking-wider uppercase">AI</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="num text-[56px] font-semibold leading-none" data-target="50">0</span>
+                <span class="text-2xl font-semibold text-[var(--accent)]">%</span>
+              </div>
+              <div class="mt-1 text-xs text-[var(--hint)]">留存相对提升</div>
+              <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">策划 AI 漫画日记及 AI 技能玩法，增加情感羁绊。</p>
+              <div class="bar mt-4"><div class="bar-fill" data-w="80"></div></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模块 2：社会公益相关 -->
+    <div class="col-span-12 md:col-span-5 reveal" style="transition-delay:.08s">
+      <div class="glass tilt p-8 h-full">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xs text-[var(--hint)] tracking-wider uppercase">02 / 长期关注</span>
+            <span class="chip">无障碍 · 公益</span>
+          </div>
+          <h3 class="text-3xl font-semibold tracking-tight">社会公益相关</h3>
+          <p class="mt-2 text-sm text-[var(--muted)]">关注无障碍及社会公益领域，让技术照见普通人。</p>
+
+          <div class="mt-7 rounded-2xl bg-white/65 border border-black/5 p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-7 h-7 rounded-xl bg-[#F2F0EA] text-[#6E5B4A] text-xs flex items-center justify-center font-medium">益</span>
+              <span class="text-xs text-[var(--hint)] tracking-wider uppercase">社会价值</span>
+            </div>
+            <div class="flex items-baseline gap-1">
+              <span class="num text-[56px] font-semibold leading-none" data-target="100">0</span>
+              <span class="text-2xl font-semibold text-[var(--accent)]">+</span>
+            </div>
+            <div class="mt-1 text-xs text-[var(--hint)]">儿童因相关成果直接受益</div>
+            <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">同心结资助系统、CHI'24 听障外卖员研究、AED 急救培训设计。</p>
+            <div class="bar mt-4"><div class="bar-fill" data-w="70"></div></div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="chip">CHI'24 一作</span>
+            <span class="chip">DIA 佳作奖</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ AI 工作主线 · Bento ============ -->
+<section id="work" class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="reveal mb-10">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--ink)] text-white text-[11px] tracking-[.15em] uppercase mb-5">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4z"/></svg>
+      <span>Part 01 · 工作主线</span>
+    </div>
+    <h2 class="text-4xl md:text-[52px] font-semibold tracking-tight">把大模型能力，<span class="grad-text">装进日常陪伴里。</span></h2>
+    <p class="mt-4 text-[var(--muted)] max-w-[720px]">在腾讯 QQ AI 宠物业务里，我负责把"大模型能力"翻译成"普通用户能感知到的产品价值"。点击卡片可展开完整 STAR。</p>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+
+    <!-- 项目一 大卡 -->
+    <div class="col-span-12 md:col-span-7 reveal">
+      <article class="glass tilt proj p-8" data-id="p1">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="chip">社交</span>
+                <span class="chip">关系链</span>
+              </div>
+              <h3 class="text-2xl font-semibold tracking-tight">QQ 宠物社交互动体系构建</h3>
+              <p class="mt-2 text-[var(--muted)] text-sm">把宠物从"单机养成"升级为"好友互动的社交载体"，激活 QQ 关系链价值。</p>
+            </div>
+            <span class="arrow w-9 h-9 rounded-full bg-white/80 border border-black/5 flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </div>
+          <div class="mt-5 grid grid-cols-3 gap-3">
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">客态主页 PV</div>
+              <div class="text-2xl font-semibold mt-1">+85%</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">互动闭环</div>
+              <div class="text-2xl font-semibold mt-1">触点·感知·沉淀</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">底层基建</div>
+              <div class="text-2xl font-semibold mt-1">支撑 N+ 场景</div>
+            </div>
+          </div>
+          <div class="detail mt-6 pt-6 border-t border-black/5 text-sm text-[var(--muted)] leading-relaxed">
+            <p><b class="text-[var(--ink)]">背景：</b>早期 QQ 宠物的客态主页（好友视角）仅支持单向浏览，缺乏双向互动能力，关系链价值未被激活。</p>
+            <p class="mt-3"><b class="text-[var(--ink)]">核心贡献：</b></p>
+            <ul class="mt-2 space-y-2 list-disc pl-5">
+              <li>主导构建 "触点 - 互动 - 感知 - 沉淀" 闭环模型，在客态主页嵌入"异步喂食"等轻量级互动触点。</li>
+              <li>打通全局互动通知体系，在 QQ 主框架展示红点 / 气泡提醒，形成"互动即通知 → 提醒促回访"的双向感知通道。</li>
+              <li>将互动消息抽象为底层基础能力，支撑后续多个社交场景的提醒玩法。</li>
+            </ul>
+            <p class="mt-3"><b class="text-[var(--ink)]">结果：</b>客态主页访问 PV 相对提升 85%，激活"以宠会友"的社交生态。</p>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- 项目二 中卡 -->
+    <div class="col-span-12 md:col-span-5 reveal" style="transition-delay:.06s">
+      <article class="glass tilt proj p-8 h-full" data-id="p2">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="chip">AI · Agent</span>
+                <span class="chip">游戏化</span>
+              </div>
+              <h3 class="text-2xl font-semibold tracking-tight">QQ AI 宠物 · 技能玩法</h3>
+              <p class="mt-2 text-[var(--muted)] text-sm">基于类 OpenClaw 架构，把大模型复杂能力拆解为可解锁、可装配的"独立技能"。</p>
+            </div>
+            <span class="arrow w-9 h-9 rounded-full bg-white/80 border border-black/5 flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </div>
+          <div class="mt-6 flex flex-wrap gap-2">
+            <span class="chip">多模态生图</span>
+            <span class="chip">语言润色</span>
+            <span class="chip">技能装备</span>
+            <span class="chip">L1 - L4 进阶</span>
+          </div>
+          <div class="detail mt-6 pt-6 border-t border-black/5 text-sm text-[var(--muted)] leading-relaxed">
+            <p><b class="text-[var(--ink)]">定位：</b>"宠物版 AI 教科书"。通过游戏化养成降低大模型使用门槛，打造 Z 世代在 QQ 体系内的 AI 交互玩法。</p>
+            <p class="mt-3"><b class="text-[var(--ink)]">关键决策：</b>相比传统"指令式 Prompt"交互，主导设计"场景化 Skill 学习与管理体系"。</p>
+            <p class="mt-3"><b class="text-[var(--ink)]">主线闭环：</b>领养 → 学习 → Skills 安装 → 日常互动。让小白用户在"养成"中自然习惯 AI 能力。</p>
+
+            <div class="mt-5 rounded-2xl overflow-hidden bg-white/70 border border-black/5 p-2">
+              <img src="assets/skills-screens.jpg" alt="QQ AI 宠物技能玩法 — 主要界面" loading="lazy" class="zoomable w-full h-auto rounded-xl block cursor-zoom-in" />
+            </div>
+            <div class="mt-2 text-[11px] text-[var(--hint)] text-center">从对话 / 技能列表 / 技能详情 / 课程养成 / 情绪陪伴 / 宠物运势 — 完整技能玩法体验</div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- 项目三 中卡 -->
+    <div class="col-span-12 md:col-span-5 reveal" style="transition-delay:.04s">
+      <article class="glass tilt proj p-8 h-full" data-id="p3">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="chip">AIGC</span>
+                <span class="chip">0 → 1</span>
+              </div>
+              <h3 class="text-2xl font-semibold tracking-tight">宠物 AI 漫画日记</h3>
+              <p class="mt-2 text-[var(--muted)] text-sm">通过 AIGC 强化"人宠情感链接"，从 0 到 1 走通行为采集 → 多模态生成 → 社交分享闭环。</p>
+            </div>
+            <span class="arrow w-9 h-9 rounded-full bg-white/80 border border-black/5 flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </div>
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">7 日留存</div>
+              <div class="text-2xl font-semibold mt-1 text-[var(--accent)]">+61.9%</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">次日留存</div>
+              <div class="text-2xl font-semibold mt-1">+13.34%</div>
+            </div>
+          </div>
+          <div class="detail mt-6 pt-6 border-t border-black/5 text-sm text-[var(--muted)] leading-relaxed">
+            <p><b class="text-[var(--ink)]">Prompt 情感化表达：</b>把干瘪的行为数据（频次 / 场景 / 上下文）转化为有趣味性、有情绪价值的"宠物独白日记"。</p>
+            <p class="mt-3"><b class="text-[var(--ink)]">生图模型：</b>主导大模型 + LoRA 微调链路，制定"形象一致性 / 画风统一性 / 情节匹配度"三大核心指标。</p>
+            <p class="mt-3"><b class="text-[var(--ink)]">A/B 验证：</b>对照组文字日记 vs 实验组漫画日记，留存与社交分享意愿大幅提升。</p>
+
+            <div class="mt-5 rounded-2xl overflow-hidden bg-white/70 border border-black/5 p-2">
+              <img src="assets/diary-screens.jpg" alt="QQ AI 宠物 — 漫画日记界面预览" loading="lazy" class="zoomable w-full h-auto rounded-xl block cursor-zoom-in" />
+            </div>
+            <div class="mt-2 text-[11px] text-[var(--hint)] text-center">客户端入口 / 漫画日记详情 / 频道社交分享 — 点击图片可查看大图</div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- 项目四 大卡 -->
+    <div class="col-span-12 md:col-span-7 reveal" style="transition-delay:.1s">
+      <article class="glass tilt proj p-8 h-full" data-id="p4">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="chip">AI 基建</span>
+                <span class="chip">0 → 1</span>
+                <span class="chip">部门级</span>
+              </div>
+              <h3 class="text-2xl font-semibold tracking-tight">AIGC 生图模型评测平台</h3>
+              <p class="mt-2 text-[var(--muted)] text-sm">从 0 到 1 打通 数据准备 → 模型训练 → 效果评测 → 问题分析 → 迭代优化 全链路。</p>
+            </div>
+            <span class="arrow w-9 h-9 rounded-full bg-white/80 border border-black/5 flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+          </div>
+          <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">数据准备</div><div class="mt-1 text-sm">标准化采集</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">模型训练</div><div class="mt-1 text-sm">Qwen / Seedream</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">客观指标</div><div class="mt-1 text-sm">畸形率 + Qwen 评分</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">主观体验</div><div class="mt-1 text-sm">用户双轨评测</div>
+            </div>
+          </div>
+          <div class="detail mt-6 pt-6 border-t border-black/5 text-sm text-[var(--muted)] leading-relaxed">
+            <p><b class="text-[var(--ink)]">背景：</b>原有多角色（产品 / 算法 / 标注）在表格中流转数据的协作成本高、迭代周期长。</p>
+            <p class="mt-3"><b class="text-[var(--ink)]">关键贡献：</b></p>
+            <ul class="mt-2 space-y-2 list-disc pl-5">
+              <li>从 0 到 1 搭建一站式平台，全链路标准化。</li>
+              <li>深入拆解文生图大模型与 LoRA 微调逻辑，建立"算法客观指标 + 用户主观体验"双轨评测体系。</li>
+              <li>沉淀为部门级 AIGC 基建，为 QQ 小 Q 助手及宠物业务提供能力支持。</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 公益 & 学术 ============ -->
+<section id="social" class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="reveal mb-10">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--accent)]/12 text-[var(--accent)] text-[11px] tracking-[.15em] uppercase mb-5" style="background:rgba(255,127,78,.12);">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z"/></svg>
+      <span>Part 02 · 个人公益项目</span>
+    </div>
+    <h2 class="text-4xl md:text-[52px] font-semibold tracking-tight">技术再先进，<span class="grad-text">也要照见普通人。</span></h2>
+    <p class="mt-4 text-[var(--muted)] max-w-[720px]">这些项目是我决定做产品的初衷 — 让我相信"科技向善"不是口号。每个项目点击可查看完整背景与产出。</p>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+
+    <a href="projects/tongxinjie.html" class="col-span-12 md:col-span-4 reveal block">
+      <article class="glass tilt p-7 h-full">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-center gap-4">
+            <div class="logo-tile" style="background:#F2F0EA;color:#6E5B4A">同心</div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="chip">公益</span>
+                <span class="chip">小程序 · PM</span>
+              </div>
+              <h3 class="text-xl font-semibold tracking-tight">同心结 · 山区留守儿童资助系统</h3>
+            </div>
+          </div>
+          <p class="mt-5 text-sm text-[var(--muted)] leading-relaxed">
+            为提升资助人和管理员的协作效率，从 0 - 1 设计透明资金管理、资助关系管理、温情化儿童互动三大模块。上线后服务 120+ 资助人。
+          </p>
+          <div class="mt-5 flex items-center justify-between">
+            <span class="text-xs text-[var(--hint)]">查看详情</span>
+            <span class="w-8 h-8 rounded-full bg-white/80 border border-black/5 flex items-center justify-center">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </div>
+      </article>
+    </a>
+
+    <a href="projects/chi24.html" class="col-span-12 md:col-span-4 reveal block" style="transition-delay:.06s">
+      <article class="glass tilt p-7 h-full">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-center gap-4">
+            <div class="logo-tile" style="background:#EDF1F5;color:#4A6378">CHI</div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="chip">学术 · CCF-A</span>
+                <span class="chip">一作</span>
+              </div>
+              <h3 class="text-xl font-semibold tracking-tight">Silent Delivery · 听障外卖员研究</h3>
+            </div>
+          </div>
+          <p class="mt-5 text-sm text-[var(--muted)] leading-relaxed">
+            发表于 CHI'24（计算系统中的人为因素会议）。研究中国听障外卖员的工作动机、实践与挑战，为外卖平台可访问性提出设计建议。
+          </p>
+          <div class="mt-5 flex items-center justify-between">
+            <span class="text-xs text-[var(--hint)]">查看详情</span>
+            <span class="w-8 h-8 rounded-full bg-white/80 border border-black/5 flex items-center justify-center">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </div>
+      </article>
+    </a>
+
+    <a href="projects/aed.html" class="col-span-12 md:col-span-4 reveal block" style="transition-delay:.04s">
+      <article class="glass tilt p-7 h-full">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="flex items-center gap-4">
+            <div class="logo-tile" style="background:#F4EFE6;color:#7A6748">AED</div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="chip">设计 · AR</span>
+                <span class="chip">DIA 佳作奖</span>
+              </div>
+              <h3 class="text-xl font-semibold tracking-tight">AED 除颤仪 AR 培训系统</h3>
+            </div>
+          </div>
+          <p class="mt-5 text-sm text-[var(--muted)] leading-relaxed">
+            通过 AR 技术降低公众学习 AED 急救的门槛，让普通人也能完成关键时刻的施救动作。荣获 DIA 中国智造设计大赛佳作奖。
+          </p>
+          <div class="mt-5 flex items-center justify-between">
+            <span class="text-xs text-[var(--hint)]">查看详情</span>
+            <span class="w-8 h-8 rounded-full bg-white/80 border border-black/5 flex items-center justify-center">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </div>
+      </article>
+    </a>
+
+  </div>
+</section>
+
+<!-- ============ About ============ -->
+<section id="about" class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="grid grid-cols-12 gap-5">
+
+    <div class="col-span-12 reveal">
+      <div class="glass tilt p-9 md:p-11">
+        <div class="spotlight"></div>
+        <div class="tilt-inner">
+          <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">About</div>
+          <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">关于我</h2>
+          <p class="mt-5 text-[var(--muted)] leading-relaxed max-w-[820px]">
+            00 后，浙江大学软件学院人机交互专业（无障碍方向）硕士。研究生期间专注于"边缘人群与新技术的交互"，把这份对人的关注一路带进了产品工作。
+          </p>
+          <p class="mt-3 text-[var(--muted)] leading-relaxed max-w-[820px]">
+            做产品的方法论上，我相信"先理解人，再选择技术"。AIGC 不是技术堆砌，而是把模型的能力，转译成用户能享受的小惊喜。
+          </p>
+
+          <div class="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">教育背景</div>
+              <div class="mt-1 text-sm">浙江大学 · 人机交互硕士（无障碍方向）</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">在职荣誉</div>
+              <div class="mt-1 text-sm">2025 Q3 社交线 Star-AI 新锐奖</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">学术成果</div>
+              <div class="mt-1 text-sm">CHI'24 一作 (CCF-A)</div>
+            </div>
+            <div class="rounded-2xl bg-white/60 border border-black/5 p-4">
+              <div class="text-xs text-[var(--hint)]">竞赛奖项</div>
+              <div class="mt-1 text-sm">DIA 中国智造设计大赛 · 佳作奖</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ Contact ============ -->
+<section id="contact" class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="reveal">
+    <div class="glass tilt p-12 text-center">
+      <div class="spotlight"></div>
+      <div class="tilt-inner">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">Let's talk</div>
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">如果你也在做<span class="grad-text"> 有温度的 AI 产品</span><br/>欢迎随时找我聊聊。</h2>
+
+        <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <a href="mailto:dong3561@foxmail.com" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--ink)] text-white text-sm font-medium hover:opacity-90 transition shadow-lg shadow-black/10">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            dong3561@foxmail.com
+          </a>
+          <a href="javascript:void(0)" onclick="navigator.clipboard&&navigator.clipboard.writeText('13284155127');this.querySelector('.wx-label').textContent='已复制 ✓';setTimeout(()=>{this.querySelector('.wx-label').textContent='微信 · 13284155127'},1800);" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/70 backdrop-blur border border-black/5 text-sm font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 4C5.36 4 2 6.69 2 10c0 1.89 1.08 3.56 2.78 4.66l-.7 2.34 2.62-1.4c.85.16 1.7.24 2.55.24l.6-.02C9.55 14.66 9.4 13.85 9.4 13c0-3.59 3.41-6.5 7.6-6.5.16 0 .31.01.46.02C16.06 4.45 13.05 4 9.5 4zM6.5 8.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm6 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM17 7.5c-3.31 0-6 2.24-6 5s2.69 5 6 5c.69 0 1.36-.1 2-.27l2.16 1.15-.59-1.94C21.5 15.5 22 13.96 22 12.5c0-2.76-2.69-5-5-5zm-2 4a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5zm4 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"/></svg>
+            <span class="wx-label">微信 · 13284155127</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="px-6 pb-12 pt-6 max-w-[1240px] mx-auto flex items-center justify-between text-xs text-[var(--hint)]">
+  <span>© 2026 Dylan Wang · 做有温度的 AI 产品</span>
+  <span>最后更新于 2026.05</span>
+</footer>
+
+</main>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+  <button class="lightbox-close" aria-label="关闭">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <img id="lightbox-img" src="" alt="" />
+  <div class="lightbox-hint">点击任意空白处关闭 · 按 ESC 退出</div>
+</div>
+
+<script>
+/* ===== Reveal on scroll ===== */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      // 数字增长
+      e.target.querySelectorAll('[data-target]').forEach(el=>{
+        if(el.dataset.done) return;
+        const target = parseFloat(el.dataset.target);
+        const decimals = parseInt(el.dataset.decimals||'0',10);
+        const dur = 1400;
+        const start = performance.now();
+        const ease = t => 1 - Math.pow(1 - t, 3);
+        function tick(now){
+          const t = Math.min(1, (now - start)/dur);
+          const v = target * ease(t);
+          el.textContent = v.toFixed(decimals);
+          if(t<1) requestAnimationFrame(tick);
+          else el.dataset.done = '1';
+        }
+        requestAnimationFrame(tick);
+      });
+      // 进度条
+      e.target.querySelectorAll('.bar-fill').forEach(b=>{
+        if(b.dataset.done) return;
+        requestAnimationFrame(()=>{ b.style.width = b.dataset.w + '%'; });
+        b.dataset.done = '1';
+      });
+    }
+  });
+},{ threshold:.18 });
+document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+
+/* ===== tvOS parallax tilt ===== */
+const tilts = document.querySelectorAll('.tilt');
+tilts.forEach(card=>{
+  card.addEventListener('mousemove', (e)=>{
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const px = x / r.width, py = y / r.height;
+    const rx = (py - .5) * -10;
+    const ry = (px - .5) * 12;
+    card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+    const inner = card.querySelector('.tilt-inner');
+    if(inner) inner.style.transform = `translateZ(40px) translate(${(px-.5)*6}px, ${(py-.5)*6}px)`;
+    card.style.setProperty('--mx', x+'px');
+    card.style.setProperty('--my', y+'px');
+  });
+  card.addEventListener('mouseleave', ()=>{
+    card.style.transform = '';
+    const inner = card.querySelector('.tilt-inner');
+    if(inner) inner.style.transform = '';
+  });
+});
+
+/* ===== 项目展开 ===== */
+document.querySelectorAll('.proj').forEach(card=>{
+  card.addEventListener('click', (e)=>{
+    if(e.target.closest('a')) return;
+    if(e.target.closest('.zoomable')) return;
+    card.classList.toggle('open');
+  });
+});
+
+/* ===== Lightbox 图片放大 ===== */
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lightbox-img');
+const lbClose = lb.querySelector('.lightbox-close');
+function openLightbox(src, alt){
+  lbImg.src = src;
+  lbImg.alt = alt || '';
+  lb.classList.add('open');
+  lb.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){
+  lb.classList.remove('open');
+  lb.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+  setTimeout(()=>{ lbImg.src = ''; }, 350);
+}
+document.querySelectorAll('img.zoomable').forEach(img=>{
+  img.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    openLightbox(img.currentSrc || img.src, img.alt);
+  });
+});
+lb.addEventListener('click', (e)=>{
+  if(e.target === lbImg) return;
+  closeLightbox();
+});
+lbClose.addEventListener('click', closeLightbox);
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && lb.classList.contains('open')) closeLightbox();
+});
+
+/* ===== Avatar 点击爱心彩蛋 ===== */
+const avatarWrap = document.getElementById('avatarWrap');
+if(avatarWrap){
+  let avatarTimer = null;
+  avatarWrap.addEventListener('click', ()=>{
+    avatarWrap.classList.remove('loved');
+    void avatarWrap.offsetWidth; // 强制重排，让动画可重复触发
+    avatarWrap.classList.add('loved');
+    clearTimeout(avatarTimer);
+    avatarTimer = setTimeout(()=>{
+      avatarWrap.classList.remove('loved');
+    }, 1700);
+  });
+}
+</script>
+
+</body>
+</html>

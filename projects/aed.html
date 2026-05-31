@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AED AR 培训系统 | Dylan</title>
+<meta name="description" content="AED 除颤仪 AR 培训系统设计 — 让普通人也能在关键时刻完成施救，DIA 中国智造设计大赛佳作奖。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:#FAFAF7;
+    --ink:#1B2330;
+    --muted:#5B6573;
+    --hint:#8C95A2;
+    --line:rgba(27,35,48,.08);
+    --glass:rgba(255,255,255,.7);
+    --accent:#FF7F4E;
+    --aurora-1:#DCE3F0;
+    --aurora-2:#E8E0F0;
+    --aurora-3:#FFE8DA;
+  }
+  *{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:"Inter","Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    overflow-x:hidden;
+    letter-spacing:.005em;
+  }
+  .aurora{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    overflow:hidden; filter:blur(80px); opacity:.5;
+  }
+  .aurora::before, .aurora::after, .aurora .blob{
+    content:""; position:absolute; border-radius:50%; will-change:transform;
+  }
+  .aurora::before{
+    width:760px; height:760px; left:-15%; top:-20%;
+    background:radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
+    animation:floatA 32s ease-in-out infinite;
+  }
+  .aurora::after{
+    width:820px; height:820px; right:-20%; top:25%;
+    background:radial-gradient(circle, var(--aurora-2) 0%, transparent 65%);
+    animation:floatB 38s ease-in-out infinite;
+  }
+  .aurora .blob.b1{
+    width:680px; height:680px; left:35%; bottom:-10%;
+    background:radial-gradient(circle, var(--aurora-3) 0%, transparent 65%);
+    animation:floatC 42s ease-in-out infinite;
+  }
+  @keyframes floatA{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,40px)} }
+  @keyframes floatB{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,60px)} }
+  @keyframes floatC{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-50px)} }
+
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(27,35,48,.04),
+      0 8px 32px rgba(27,35,48,.06);
+    border-radius:28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .glass::before{
+    content:""; position:absolute; inset:-1px; border-radius:inherit;
+    background:linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,.4));
+    pointer-events:none; opacity:.5;
+    animation:breath 8s ease-in-out infinite;
+  }
+  @keyframes breath{ 0%,100%{opacity:.4} 50%{opacity:.7} }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px;
+    background:rgba(255,255,255,.65);
+    border:1px solid rgba(27,35,48,.08);
+    font-size:12px; color:var(--muted);
+    backdrop-filter:blur(12px);
+  }
+  .chip{
+    display:inline-flex; align-items:center; padding:4px 10px;
+    border-radius:8px; font-size:11px; color:var(--muted);
+    background:rgba(27,35,48,.04); border:1px solid rgba(27,35,48,.06);
+  }
+  .logo-tile{
+    width:64px; height:64px; border-radius:20px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:600; font-size:16px;
+    background:#F4EFE6; color:#7A6748;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,1), 0 8px 24px rgba(27,35,48,.06);
+  }
+  .nav-glass{
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:999px;
+    box-shadow:0 4px 24px rgba(27,35,48,.06);
+  }
+  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in{ opacity:1; transform:none; }
+  ::selection{ background:rgba(255,127,78,.25); }
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(27,35,48,.15); border-radius:4px; }
+  .kbd-num{ font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+
+<div class="aurora">
+  <span class="blob b1"></span>
+</div>
+
+<!-- ============ Nav ============ -->
+<nav class="fixed top-5 left-1/2 -translate-x-1/2 z-50 nav-glass px-3 py-2 flex items-center gap-1 text-sm">
+  <a href="../index.html" class="px-3 py-1 rounded-full hover:bg-black/5 transition flex items-center gap-2 text-[var(--ink)]">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span class="font-medium">返回主页</span>
+  </a>
+  <span class="w-px h-4 bg-black/10 mx-1"></span>
+  <span class="px-3 text-[var(--muted)]">Project · AED AR Training</span>
+</nav>
+
+<main class="relative z-10">
+
+<!-- ============ Hero ============ -->
+<section class="pt-28 pb-16 px-6 max-w-[1240px] mx-auto">
+  <div class="reveal">
+    <div class="flex items-center gap-2 mb-6">
+      <a href="../index.html" class="text-sm text-[var(--muted)] hover:text-[var(--ink)] transition">主页</a>
+      <span class="text-[var(--hint)]">/</span>
+      <span class="text-sm text-[var(--muted)]">公益项目</span>
+      <span class="text-[var(--hint)]">/</span>
+      <span class="text-sm text-[var(--ink)]">AED AR 培训系统</span>
+    </div>
+
+    <!-- 头图 -->
+    <div class="rounded-[32px] overflow-hidden border border-black/5 shadow-[0_24px_60px_rgba(27,35,48,.12)] bg-white">
+      <img src="../assets/aed-cover.jpg" alt="AED AR Training System 主视觉" class="w-full h-auto block" />
+    </div>
+
+    <!-- 标题区 -->
+    <div class="mt-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-3 mb-5">
+          <div class="logo-tile">AED</div>
+          <div class="pill"><span class="w-1.5 h-1.5 rounded-full bg-[#FF7F4E]"></span><span>DIA 中国智造设计大赛 · 佳作奖</span></div>
+        </div>
+        <h1 class="text-[40px] md:text-[58px] leading-[1.05] font-semibold tracking-tight">AED AR Training System</h1>
+        <p class="mt-3 text-xl text-[var(--muted)]">AED 除颤仪 AR 培训系统设计 · 浙江大学</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span class="chip">主创设计师</span>
+        <span class="chip">AR · 急救培训</span>
+        <span class="chip">2022</span>
+      </div>
+    </div>
+
+    <p class="mt-8 max-w-[820px] text-[17px] text-[var(--muted)] leading-relaxed">
+      心脏骤停的 1 分钟内若使用 AED，存活率可高达 90%。但中国急救知识普及率不到 5% — 大多数人在关键时刻"知道有 AED"，却"不敢上手用"。
+      这套 AR 培训系统设计，希望让 AED 真正<b class="text-[var(--ink)] font-medium">从"装在墙上的设备"变成"普通人也敢按下的工具"</b>。
+    </p>
+  </div>
+</section>
+
+<!-- ============ 关键数据 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 reveal">
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">黄金 1 分钟</div>
+      <div class="kbd-num text-[44px] font-semibold leading-none mt-2">90<span class="text-2xl text-[var(--accent)]">%</span></div>
+      <div class="text-xs text-[var(--hint)] mt-2">骤停 1 分钟内施救存活率</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">急救普及</div>
+      <div class="kbd-num text-[44px] font-semibold leading-none mt-2">&lt;5<span class="text-2xl text-[var(--accent)]">%</span></div>
+      <div class="text-xs text-[var(--hint)] mt-2">中国急救知识普及率</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">未见过 AED</div>
+      <div class="kbd-num text-[44px] font-semibold leading-none mt-2">71.4<span class="text-2xl text-[var(--accent)]">%</span></div>
+      <div class="text-xs text-[var(--hint)] mt-2">大学生从未见过 AED</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">仍会使用</div>
+      <div class="kbd-num text-[44px] font-semibold leading-none mt-2">6.6<span class="text-2xl text-[var(--accent)]">%</span></div>
+      <div class="text-xs text-[var(--hint)] mt-2">仅有 6.6% 学生会用 AED</div>
+    </div>
+  </div>
+  <p class="mt-3 text-xs text-[var(--hint)]">数据来自暨南大学《大学生对心源性猝死及其急救相关知识认知现状分析》及相关媒体调查。</p>
+</section>
+
+<!-- ============ 设计背景 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">设计背景</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">设备已就位 · 人却没准备好</h2>
+    <p class="mt-3 text-[var(--muted)] max-w-[760px]">校园猝死事件时有发生，AED 进校园势在必行。但仅靠"装上墙"远远不够 — 真正的瓶颈在于"会用的人"太少。</p>
+  </div>
+  <div class="reveal">
+    <div class="glass p-3 md:p-4">
+      <img src="../assets/aed-background.jpg" alt="AED 培训设计背景与现状" loading="lazy" class="w-full h-auto rounded-2xl block" />
+    </div>
+  </div>
+
+  <div class="mt-8 grid grid-cols-12 gap-5">
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-9 h-9 rounded-2xl bg-[#FFEAE0] text-[#C2410C] flex items-center justify-center text-sm font-medium">1</span>
+          <h3 class="text-lg font-semibold">认知误区</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          调查显示 <b class="text-[var(--ink)] font-medium">68.3%</b> 的学生在心脏骤停现场会选择"拨打 120 并原地等候"，而不是立即施救 — 错过了存活率最高的黄金 1 分钟。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-6 reveal" style="transition-delay:.06s">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-9 h-9 rounded-2xl bg-[#FFEAE0] text-[#C2410C] flex items-center justify-center text-sm font-medium">2</span>
+          <h3 class="text-lg font-semibold">培训困局</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          疫情常态化后，<b class="text-[var(--ink)] font-medium">线下集中培训多被取消</b>，学生缺少接触 AED 的真实机会。靠图文 / 视频学习的知识无法转化为现场行动力。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 设计目标 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal">
+    <div class="glass p-9 md:p-12">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">设计目标</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">让"敢上手"成为肌肉记忆</h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <div class="text-sm font-medium">沉浸式</div>
+          <p class="mt-1 text-sm text-[var(--muted)] leading-relaxed">用 AR 还原心脏骤停现场，让学习者在真实压力下做出反应。</p>
+        </div>
+        <div>
+          <div class="text-sm font-medium">低门槛</div>
+          <p class="mt-1 text-sm text-[var(--muted)] leading-relaxed">小程序预约 + 扫码借用，把 AED 培训嵌入校园日常生活。</p>
+        </div>
+        <div>
+          <div class="text-sm font-medium">可追溯</div>
+          <p class="mt-1 text-sm text-[var(--muted)] leading-relaxed">培训记录、考核数据沉淀，让"上过课"变成可见的能力。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 产品使用流程 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">产品使用流程</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">六步闭环 · 让训练像借书一样简单</h2>
+    <p class="mt-3 text-[var(--muted)] max-w-[760px]">从微信小程序预约，到 AR 设备实战训练，再到训练记录回看 — 所有环节为校园场景而设计。</p>
+  </div>
+  <div class="reveal">
+    <div class="glass p-3 md:p-5">
+      <img src="../assets/aed-flow.png" alt="AED AR 培训系统使用流程" loading="lazy" class="w-full h-auto rounded-2xl block" />
+    </div>
+  </div>
+
+  <div class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-3">
+    <div class="rounded-xl bg-white/65 border border-black/5 p-4">
+      <div class="flex items-center gap-2 mb-1"><span class="w-6 h-6 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] text-xs flex items-center justify-center font-medium">1</span><div class="text-sm font-medium">预约</div></div>
+      <div class="text-[12px] text-[var(--hint)] mt-1 leading-relaxed">微信小程序选择时段与教室。</div>
+    </div>
+    <div class="rounded-xl bg-white/65 border border-black/5 p-4">
+      <div class="flex items-center gap-2 mb-1"><span class="w-6 h-6 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] text-xs flex items-center justify-center font-medium">2</span><div class="text-sm font-medium">到店</div></div>
+      <div class="text-[12px] text-[var(--hint)] mt-1 leading-relaxed">指定时间到达指定培训室。</div>
+    </div>
+    <div class="rounded-xl bg-white/65 border border-black/5 p-4">
+      <div class="flex items-center gap-2 mb-1"><span class="w-6 h-6 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] text-xs flex items-center justify-center font-medium">3</span><div class="text-sm font-medium">借用</div></div>
+      <div class="text-[12px] text-[var(--hint)] mt-1 leading-relaxed">小程序扫码借用 AR 设备。</div>
+    </div>
+    <div class="rounded-xl bg-white/65 border border-black/5 p-4" style="border-color:rgba(255,127,78,.4);background:rgba(255,127,78,.06);">
+      <div class="flex items-center gap-2 mb-1"><span class="w-6 h-6 rounded-full bg-[var(--accent)] text-white text-xs flex items-center justify-center font-medium">4</span><div class="text-sm font-medium">AR 培训</div></div>
+      <div class="text-[12px] text-[var(--hint)] mt-1 leading-relaxed">⚡ 沉浸式实战施救流程。</div>
+    </div>
+    <div class="rounded-xl bg-white/65 border border-black/5 p-4">
+      <div class="flex items-center gap-2 mb-1"><span class="w-6 h-6 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] text-xs flex items-center justify-center font-medium">5</span><div class="text-sm font-medium">归还</div></div>
+      <div class="text-[12px] text-[var(--hint)] mt-1 leading-relaxed">小程序扫码归还设备。</div>
+    </div>
+    <div class="rounded-xl bg-white/65 border border-black/5 p-4">
+      <div class="flex items-center gap-2 mb-1"><span class="w-6 h-6 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] text-xs flex items-center justify-center font-medium">6</span><div class="text-sm font-medium">回看</div></div>
+      <div class="text-[12px] text-[var(--hint)] mt-1 leading-relaxed">小程序查看训练记录与评估。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AR 训练核心体验 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">AR 训练核心体验</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">把 AED 的每一步 · 浮在你眼前</h2>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">01</span>
+          <h3 class="text-lg font-semibold tracking-tight">空间引导</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          AR 在真实环境中标记 AED 摆放位置、电极片粘贴部位，<b class="text-[var(--ink)] font-medium">把"知道在哪"变成"看得见在哪"</b>。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">02</span>
+          <h3 class="text-lg font-semibold tracking-tight">分步操作提示</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          每一步操作（开机 / 贴电极 / 远离 / 按下放电）都<b class="text-[var(--ink)] font-medium">在视野中浮动提示</b>，按对了打勾，按错了即时反馈。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">03</span>
+          <h3 class="text-lg font-semibold tracking-tight">情境化压力</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          AR 还原"<b class="text-[var(--ink)] font-medium">人晕倒在地</b>"的真实场景，配合心率倒计时音效，让学员在<b class="text-[var(--ink)] font-medium">真实压力下做决策</b>，把知识转化为肌肉记忆。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 设计哲学 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal">
+    <div class="glass p-9 md:p-12">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">设计哲学</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">不要让 AED 只是"挂在墙上的好心"</h2>
+      <p class="mt-5 text-[var(--muted)] leading-relaxed text-[16px] max-w-[820px]">
+        每一台贴在墙上的 AED，都是社会善意的物理化。但善意如果没有"会用的人"在场，它就只是一台没人敢按的盒子。
+      </p>
+      <p class="mt-3 text-[var(--muted)] leading-relaxed text-[16px] max-w-[820px]">
+        我希望这套系统能<b class="text-[var(--ink)] font-medium">把 AED 从"硬件部署"推进到"行为改变"</b>。当一个人学过、上手过、被肌肉记忆托住过 — 那一刻他不会再是路过的人。这是 AR 真正的意义：让虚拟的演练，变成现实的勇气。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 获奖与意义 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="grid grid-cols-12 gap-5">
+    <div class="col-span-12 md:col-span-7 reveal">
+      <div class="glass p-9 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">获奖记录</div>
+        <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">DIA 中国智造设计大赛 · 佳作奖</h2>
+        <p class="mt-5 text-[var(--muted)] leading-relaxed">
+          DIA（中国设计智造大奖）由中国美术学院发起，是面向全球的高规格工业 / 数字设计奖项。本作品由浙江大学独立提交，获得 2022 年度<b class="text-[var(--ink)] font-medium">佳作奖</b>。
+        </p>
+        <a href="https://www.di-award.org/zh/collections/detail/1307.html" target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-2 text-sm text-[var(--accent)] hover:underline">
+          在 DIA 官网查看获奖记录
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-5 reveal">
+      <div class="glass p-9 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">这个项目教给我什么</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight">"硬件 + 软件 + 服务"</h3>
+        <p class="mt-5 text-[var(--muted)] text-[15px] leading-relaxed">
+          这是我第一次完整跑通一个"硬件 + 数字产品 + 服务设计"协同的项目。它让我意识到：<b class="text-[var(--ink)] font-medium">真正影响行为的是体验链路，不是单一产品</b>。
+        </p>
+        <p class="mt-3 text-[var(--muted)] text-[15px] leading-relaxed">
+          这种"系统级设计观"，后来一直影响我做 AIGC 产品时的思考方式。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 下一个 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="reveal">
+    <div class="glass p-10 md:p-12 text-center">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">Next</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">回到主页 · 看看其他项目</h2>
+      <p class="mt-4 text-[var(--muted)]">QQ AI 宠物业务、同心结资助系统、CHI'24 听障外卖员研究。</p>
+      <a href="../index.html" class="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--ink)] text-white text-sm font-medium hover:opacity-90 transition shadow-lg shadow-black/10">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回 Dylan 的主页
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="px-6 pb-12 pt-6 max-w-[1240px] mx-auto flex items-center justify-between text-xs text-[var(--hint)]">
+  <span>© 2026 Dylan Wang · 做有温度的 AI 产品</span>
+  <span>Project · AED AR Training System</span>
+</footer>
+
+</main>
+
+<script>
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); } });
+},{ threshold:.18 });
+document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+</script>
+
+</body>
+</html>
