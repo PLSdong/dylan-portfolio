@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Silent Delivery · 无声外卖 | Dylan</title>
+<meta name="description" content="CHI'24 论文 — 无声骑手研究：从一通错过的电话开始，关注 10 万听障外卖骑手的就业与无障碍沟通。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:#FAFAF7;
+    --ink:#1B2330;
+    --muted:#5B6573;
+    --hint:#8C95A2;
+    --line:rgba(27,35,48,.08);
+    --glass:rgba(255,255,255,.7);
+    --accent:#FF7F4E;
+    --aurora-1:#DCE3F0;
+    --aurora-2:#E8E0F0;
+    --aurora-3:#FFE8DA;
+  }
+  *{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:"Inter","Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    overflow-x:hidden;
+    letter-spacing:.005em;
+  }
+  .aurora{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    overflow:hidden; filter:blur(80px); opacity:.5;
+  }
+  .aurora::before, .aurora::after, .aurora .blob{
+    content:""; position:absolute; border-radius:50%; will-change:transform;
+  }
+  .aurora::before{
+    width:760px; height:760px; left:-15%; top:-20%;
+    background:radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
+    animation:floatA 32s ease-in-out infinite;
+  }
+  .aurora::after{
+    width:820px; height:820px; right:-20%; top:25%;
+    background:radial-gradient(circle, var(--aurora-2) 0%, transparent 65%);
+    animation:floatB 38s ease-in-out infinite;
+  }
+  .aurora .blob.b1{
+    width:680px; height:680px; left:35%; bottom:-10%;
+    background:radial-gradient(circle, var(--aurora-3) 0%, transparent 65%);
+    animation:floatC 42s ease-in-out infinite;
+  }
+  @keyframes floatA{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,40px)} }
+  @keyframes floatB{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,60px)} }
+  @keyframes floatC{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-50px)} }
+
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(27,35,48,.04),
+      0 8px 32px rgba(27,35,48,.06);
+    border-radius:28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .glass::before{
+    content:""; position:absolute; inset:-1px; border-radius:inherit;
+    background:linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,.4));
+    pointer-events:none; opacity:.5;
+    animation:breath 8s ease-in-out infinite;
+  }
+  @keyframes breath{ 0%,100%{opacity:.4} 50%{opacity:.7} }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px;
+    background:rgba(255,255,255,.65);
+    border:1px solid rgba(27,35,48,.08);
+    font-size:12px; color:var(--muted);
+    backdrop-filter:blur(12px);
+  }
+  .chip{
+    display:inline-flex; align-items:center; padding:4px 10px;
+    border-radius:8px; font-size:11px; color:var(--muted);
+    background:rgba(27,35,48,.04); border:1px solid rgba(27,35,48,.06);
+  }
+  .logo-tile{
+    width:64px; height:64px; border-radius:20px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:600; font-size:16px;
+    background:#EDF1F5; color:#4A6378;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,1), 0 8px 24px rgba(27,35,48,.06);
+  }
+  .nav-glass{
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:999px;
+    box-shadow:0 4px 24px rgba(27,35,48,.06);
+  }
+  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in{ opacity:1; transform:none; }
+  ::selection{ background:rgba(255,127,78,.25); }
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(27,35,48,.15); border-radius:4px; }
+  .kbd-num{ font-variant-numeric:tabular-nums; }
+
+  /* ====== 论文头图：声波 + 静默主题 ====== */
+  .paper-hero{
+    position:relative;
+    border-radius:32px;
+    overflow:hidden;
+    background:linear-gradient(135deg,#1F2740 0%, #2C3654 45%, #3A4570 100%);
+    box-shadow:0 24px 60px rgba(27,35,48,.18);
+    border:1px solid rgba(255,255,255,.08);
+    height:380px;
+  }
+  .paper-hero .ring{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.15);
+  }
+  .paper-hero .ring.r1{ width:240px; height:240px; animation:pulseRing 4s ease-out infinite; }
+  .paper-hero .ring.r2{ width:380px; height:380px; animation:pulseRing 4s ease-out 1s infinite; }
+  .paper-hero .ring.r3{ width:520px; height:520px; animation:pulseRing 4s ease-out 2s infinite; }
+  .paper-hero .ring.r4{ width:680px; height:680px; animation:pulseRing 4s ease-out 3s infinite; }
+  @keyframes pulseRing{ 0%{opacity:0;transform:translate(-50%,-50%) scale(.95)} 30%{opacity:.6} 100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)} }
+  .paper-hero .center-icon{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:88px; height:88px; border-radius:24px;
+    background:rgba(255,255,255,.92);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 16px 40px rgba(0,0,0,.3);
+  }
+  .paper-hero .label-tl{ position:absolute; top:24px; left:24px; }
+  .paper-hero .label-tr{ position:absolute; top:24px; right:24px; }
+  .paper-hero .label-bl{ position:absolute; bottom:28px; left:28px; right:28px; }
+  .paper-hero .glow{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:600px; height:600px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,127,78,.35) 0%, transparent 60%);
+    pointer-events:none;
+  }
+
+  .quote-card{
+    background:rgba(255,255,255,.6);
+    border:1px solid rgba(27,35,48,.06);
+    border-radius:20px;
+    border-left:3px solid var(--accent);
+    padding:24px 28px;
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora">
+  <span class="blob b1"></span>
+</div>
+
+<!-- ============ Nav ============ -->
+<nav class="fixed top-5 left-1/2 -translate-x-1/2 z-50 nav-glass px-3 py-2 flex items-center gap-1 text-sm">
+  <a href="../index.html" class="px-3 py-1 rounded-full hover:bg-black/5 transition flex items-center gap-2 text-[var(--ink)]">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span class="font-medium">返回主页</span>
+  </a>
+  <span class="w-px h-4 bg-black/10 mx-1"></span>
+  <span class="px-3 text-[var(--muted)]">Project · Silent Delivery</span>
+</nav>
+
+<main class="relative z-10">
+
+<!-- ============ Hero ============ -->
+<section class="pt-28 pb-16 px-6 max-w-[1240px] mx-auto">
+  <div class="reveal">
+    <div class="flex items-center gap-2 mb-6">
+      <a href="../index.html" class="text-sm text-[var(--muted)] hover:text-[var(--ink)] transition">主页</a>
+      <span class="text-[var(--hint)]">/</span>
+      <span class="text-sm text-[var(--muted)]">学术研究</span>
+      <span class="text-[var(--hint)]">/</span>
+      <span class="text-sm text-[var(--ink)]">Silent Delivery</span>
+    </div>
+
+    <!-- 头图 -->
+    <div class="paper-hero">
+      <div class="glow"></div>
+      <div class="ring r4"></div>
+      <div class="ring r3"></div>
+      <div class="ring r2"></div>
+      <div class="ring r1"></div>
+      <div class="center-icon">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1F2740" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+          <line x1="22" y1="3" x2="16" y2="21" stroke="#FF7F4E" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="label-tl">
+        <div class="pill" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.2);">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#FF7F4E]"></span>
+          <span>CHI'24 · CCF-A · 学生一作</span>
+        </div>
+      </div>
+      <div class="label-tr">
+        <div class="pill" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.2);">
+          <span>ACM · 2024.05.11</span>
+        </div>
+      </div>
+      <div class="label-bl text-white/80 text-xs md:text-sm tracking-wider">
+        <span class="opacity-60">A study on</span> Deaf or Hard of Hearing Couriers <span class="opacity-60">in China's food delivery industry.</span>
+      </div>
+    </div>
+
+    <div class="mt-10">
+      <div class="text-[15px] text-[var(--muted)] tracking-wide mb-3">CHI '24 · ACM Digital Library · Article No. 386</div>
+      <h1 class="text-[40px] md:text-[58px] leading-[1.05] font-semibold tracking-tight">Silent Delivery</h1>
+      <p class="mt-3 text-xl text-[var(--muted)]">无声外卖 · 听障骑手的工作动机、实践与挑战</p>
+
+      <div class="mt-6 flex flex-wrap gap-2">
+        <span class="chip">人机交互 · HCI</span>
+        <span class="chip">无障碍研究</span>
+        <span class="chip">CCF-A</span>
+        <span class="chip">学生一作</span>
+        <span class="chip">质性研究</span>
+      </div>
+    </div>
+
+    <p class="mt-8 max-w-[800px] text-[17px] text-[var(--muted)] leading-relaxed">
+      这篇 CHI'24 论文聚焦中国外卖行业里 <b class="text-[var(--ink)] font-medium">听障 / 聋哑骑手（DHH Couriers）</b>这一被忽视的群体，
+      研究他们如何借助平台技术与人工干预完成日常工作，并对外卖平台的无障碍设计提出建议。
+      它的起点，是我自己的一次错过 — 我没接到一通"虚拟号"打来的电话。
+    </p>
+  </div>
+</section>
+
+<!-- ============ 故事钩子 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal">
+    <div class="glass p-9 md:p-12">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">写作起点</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">从一通没接到的电话开始</h2>
+      <div class="mt-7 grid grid-cols-12 gap-6 items-start">
+        <div class="col-span-12 md:col-span-7">
+          <p class="text-[17px] text-[var(--muted)] leading-relaxed">
+            那天我点了一份外卖。一个陌生的"虚拟号码"打进来，我看了一眼 — 平台号、骚扰号常见，<b class="text-[var(--ink)] font-medium">就没接</b>。
+          </p>
+          <p class="mt-4 text-[17px] text-[var(--muted)] leading-relaxed">
+            十几分钟后，订单显示"超时"。骑手联系不上我，最后只能空跑一程。事后我才知道，那是一位<b class="text-[var(--ink)] font-medium">听障骑手</b>，平台为他生成的 AI 语音电话用的就是虚拟号。
+          </p>
+          <p class="mt-4 text-[17px] text-[var(--muted)] leading-relaxed">
+            他没有"打电话沟通"的能力，平台为他做了 AI 替代，可消费者却<b class="text-[var(--ink)] font-medium">本能地不信任虚拟号</b>。这场错过不是任何一方的错，但代价由最弱势的一方承担了。
+          </p>
+          <p class="mt-4 text-[17px] text-[var(--muted)] leading-relaxed">
+            那一刻我意识到：一个看似很周到的"无障碍设计"，可能在落地时被另一端的不信任彻底抵消。我想知道这种错过有多少，背后是怎样的群体。<b class="text-[var(--ink)] font-medium">这就是这项研究的开始。</b>
+          </p>
+        </div>
+        <div class="col-span-12 md:col-span-5">
+          <div class="quote-card">
+            <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">数据背景</div>
+            <div class="kbd-num text-[44px] font-semibold leading-none">10<span class="text-2xl text-[var(--accent)]">万</span></div>
+            <div class="text-sm text-[var(--muted)] mt-2">听障外卖骑手</div>
+            <div class="mt-4 text-xs text-[var(--hint)]">越来越多听障人士通过外卖平台获得稳定就业，但配送全流程中的沟通卡点，仍在影响他们的收入与安全。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 论文卡 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">论文信息</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">CHI'24 · 计算系统中的人为因素会议</h2>
+    <p class="mt-3 text-[var(--muted)]">CHI 是 HCI 领域顶级会议（CCF-A 类），每年录用率约 25%。</p>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-3">题目</div>
+        <h3 class="text-xl font-semibold leading-snug">Silent Delivery: Practices and Challenges of Delivering Among Deaf or Hard of Hearing Couriers</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">中文题目：无声外卖 — 失聪及听力障碍外卖骑手的工作动机、实践与挑战</p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-3">基本信息</div>
+        <ul class="space-y-3 text-[15px] text-[var(--muted)]">
+          <li class="flex items-start gap-3"><span class="text-[var(--hint)] w-20 flex-shrink-0">会议</span><span class="text-[var(--ink)]">CHI '24（CCF-A）</span></li>
+          <li class="flex items-start gap-3"><span class="text-[var(--hint)] w-20 flex-shrink-0">发表</span><span class="text-[var(--ink)]">2024 · ACM Digital Library</span></li>
+          <li class="flex items-start gap-3"><span class="text-[var(--hint)] w-20 flex-shrink-0">作者署名</span><span class="text-[var(--ink)]">Shi Chen（导师）· <b>Xiaodong Wang</b> 等 7 人</span></li>
+          <li class="flex items-start gap-3"><span class="text-[var(--hint)] w-20 flex-shrink-0">我的角色</span><span class="text-[var(--ink)]">学生一作 · 选题与设计建议核心贡献</span></li>
+          <li class="flex items-start gap-3"><span class="text-[var(--hint)] w-20 flex-shrink-0">论文长度</span><span class="text-[var(--ink)]">17 页全长论文（Full Paper）</span></li>
+        </ul>
+        <a href="https://dl.acm.org/doi/10.1145/3613904.3642801" target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-2 text-sm text-[var(--accent)] hover:underline">
+          在 ACM 上阅读全文
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 研究方法 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">研究方法</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">质性访谈 · 听他们怎么说</h2>
+    <p class="mt-3 text-[var(--muted)] max-w-[680px]">研究的核心是和听障骑手面对面对话，加入手语翻译、文字交流，把他们的真实经验逐字记录下来。</p>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">研究方法</div>
+        <h3 class="text-xl font-semibold tracking-tight">半结构化深度访谈</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">围绕"动机 / 实践 / 挑战"三大主题展开，访谈语料经过专业手语翻译辅助与多轮编码分析。</p>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">受访对象</div>
+        <h3 class="text-xl font-semibold tracking-tight">听障 / 聋哑骑手</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">来自中国主要外卖平台的一线骑手，覆盖不同城市、不同听障程度（重度听损 / 双侧听损 / 听障佩戴助听设备）。</p>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">分析框架</div>
+        <h3 class="text-xl font-semibold tracking-tight">主题归纳 · 多人编码</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">采用扎根理论的开放编码 → 轴心编码 → 选择编码三步法，多名研究员独立编码后交叉对比，确保信效度。</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 实地观察 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">实地观察</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">跟车一整天 · 把流程画出来</h2>
+    <p class="mt-3 text-[var(--muted)] max-w-[780px]">访谈之外，我们还跟着无声骑手实地跑单，把整个外卖配送的<b class="text-[var(--ink)] font-medium">12 个关键节点</b>逐一拍摄、标注，找出沟通卡点真正发生在哪里。</p>
+  </div>
+  <div class="reveal">
+    <div class="glass p-4 md:p-6">
+      <div class="rounded-2xl overflow-hidden bg-white border border-black/5 p-3 md:p-4">
+        <img src="../assets/chi24-fieldwork.jpg" alt="无声骑手送单全流程实地观察" loading="lazy" class="w-full h-auto rounded-xl block" />
+      </div>
+      <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="rounded-xl bg-white/65 border border-black/5 p-3 text-center">
+          <div class="text-xs text-[var(--hint)]">阶段 ①</div>
+          <div class="mt-1 text-sm font-medium">取餐</div>
+          <div class="mt-1 text-[11px] text-[var(--hint)]">手势比划 · 找单</div>
+        </div>
+        <div class="rounded-xl bg-white/65 border border-black/5 p-3 text-center">
+          <div class="text-xs text-[var(--hint)]">阶段 ②</div>
+          <div class="mt-1 text-sm font-medium">备餐沟通</div>
+          <div class="mt-1 text-[11px] text-[var(--hint)]">超时 · 平台转单</div>
+        </div>
+        <div class="rounded-xl bg-white/65 border border-black/5 p-3 text-center">
+          <div class="text-xs text-[var(--hint)]">阶段 ③</div>
+          <div class="mt-1 text-sm font-medium">骑行送达</div>
+          <div class="mt-1 text-[11px] text-[var(--hint)]">规划路线 · 安全</div>
+        </div>
+        <div class="rounded-xl bg-white/65 border border-black/5 p-3 text-center" style="border-color:rgba(255,127,78,.4);background:rgba(255,127,78,.06);">
+          <div class="text-xs text-[var(--accent)]">阶段 ④</div>
+          <div class="mt-1 text-sm font-medium">联系顾客</div>
+          <div class="mt-1 text-[11px] text-[var(--hint)]">⚡ AI电话 · 顾客挂断</div>
+        </div>
+      </div>
+      <div class="mt-3 text-xs text-[var(--hint)] text-center">完整观察拆解 12 个流程节点，红框标记的是无声骑手特有的沟通卡点。我自己经历的那次"错过"，就发生在阶段④。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 三大发现 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">研究发现</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">他们为什么选这行 · 怎么做 · 难在哪</h2>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+
+    <!-- 发现一：动机 -->
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">发现 01 · 动机</div>
+        <h3 class="text-xl font-semibold tracking-tight">为什么是外卖？</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          受访者普遍把外卖视为<b class="text-[var(--ink)] font-medium">最适合自己的工作之一</b>。
+        </p>
+        <ul class="mt-5 space-y-3 text-[14px] text-[var(--muted)]">
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--ink)]/60 flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">收入更好</b> · 多劳多得，不靠口才</div></li>
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--ink)]/60 flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">工作满意度</b> · 自由时间、看到反馈</div></li>
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--ink)]/60 flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">社群归属感</b> · 听障骑手群体互助</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 发现二：实践 -->
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">发现 02 · 实践</div>
+        <h3 class="text-xl font-semibold tracking-tight">他们怎么"听"和"说"？</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          骑手主动用<b class="text-[var(--ink)] font-medium">身份披露 + 平台工具 + 人工辅助</b>三层组合应对沟通。
+        </p>
+        <ul class="mt-5 space-y-3 text-[14px] text-[var(--muted)]">
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--ink)]/60 flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">身份披露</b> · 平台标签 + 短信告知</div></li>
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--ink)]/60 flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">无障碍工具</b> · AI 语音电话、语音转文字、电子沟通卡</div></li>
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--ink)]/60 flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">人工干预</b> · 商家、保安、路人帮忙补位</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 发现三：挑战 -->
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full" style="border-left:3px solid var(--accent);">
+        <div class="text-xs text-[var(--accent)] tracking-wider uppercase mb-2">发现 03 · 核心挑战</div>
+        <h3 class="text-xl font-semibold tracking-tight">技术之外，还差什么？</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          再好的无障碍工具，<b class="text-[var(--ink)] font-medium">也敌不过用户对它的不信任</b>。
+        </p>
+        <ul class="mt-5 space-y-3 text-[14px] text-[var(--muted)]">
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--accent)] flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">骑行安全</b> · 听不到喇叭、警笛</div></li>
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--accent)] flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">多任务并发</b> · 取餐、导航、沟通同步进行</div></li>
+          <li class="flex items-start gap-2"><span class="mt-[8px] w-1 h-1 rounded-full bg-[var(--accent)] flex-shrink-0"></span><div><b class="text-[var(--ink)] font-medium">用户对 AI 语音电话的不信任</b> · 误判为骚扰</div></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 设计建议 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">设计建议</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">让平台的"无障碍"真的能落地</h2>
+    <p class="mt-3 text-[var(--muted)] max-w-[760px]">仅有工具不够 — 我们提出系统性建议，让 AI 工具、平台规则、用户认知一起协同。</p>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">01</span>
+          <h3 class="text-lg font-semibold tracking-tight">让 AI 语音电话"被信任"</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          来电要明确告知"听障骑手 + AI 协助"身份，配合 App 内强提醒（红点 + 锁屏推送），<b class="text-[var(--ink)] font-medium">把"虚拟号"从陌生骚扰提升为可识别的服务通道</b>。
+        </p>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">02</span>
+          <h3 class="text-lg font-semibold tracking-tight">用户端的预知 + 共情设计</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          在用户接单页提前告知"骑手为听障人士"，让用户预先建立心理预期；用更友好的视觉语言<b class="text-[var(--ink)] font-medium">替代冷冰冰的虚拟号</b>。
+        </p>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">03</span>
+          <h3 class="text-lg font-semibold tracking-tight">骑行安全的多模态提醒</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          头盔 / 手机端提供<b class="text-[var(--ink)] font-medium">视觉 + 振动</b>双通道警示（车流、警笛、报警），降低无声骑手在路面上的生理风险。
+        </p>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">04</span>
+          <h3 class="text-lg font-semibold tracking-tight">规则上的"软容差"</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          针对身份已被识别为听障的骑手，在<b class="text-[var(--ink)] font-medium">超时判定 / 客诉处理</b>上引入有限的容错机制，把"沟通不畅 ≠ 服务失败"做制度化保障。
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 社会价值 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal">
+    <div class="glass p-9 md:p-12">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">社会价值</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">为什么这件事值得做</h2>
+
+      <div class="mt-8 grid grid-cols-12 gap-6">
+        <div class="col-span-12 md:col-span-4">
+          <div class="kbd-num text-[44px] font-semibold leading-none">10<span class="text-2xl text-[var(--accent)]">万</span></div>
+          <div class="text-sm text-[var(--muted)] mt-2">听障外卖骑手</div>
+          <div class="text-xs text-[var(--hint)] mt-1">在无声中穿行城市</div>
+        </div>
+        <div class="col-span-12 md:col-span-4">
+          <div class="kbd-num text-[44px] font-semibold leading-none">10000<span class="text-2xl text-[var(--accent)]">+</span></div>
+          <div class="text-sm text-[var(--muted)] mt-2">全国无声骑手量级</div>
+          <div class="text-xs text-[var(--hint)] mt-1">就业稳定性高于行业均值</div>
+        </div>
+        <div class="col-span-12 md:col-span-4">
+          <div class="kbd-num text-[44px] font-semibold leading-none">17<span class="text-2xl text-[var(--accent)]">页</span></div>
+          <div class="text-sm text-[var(--muted)] mt-2">CHI'24 Full Paper</div>
+          <div class="text-xs text-[var(--hint)] mt-1">学界首批 DHH 骑手系统研究</div>
+        </div>
+      </div>
+
+      <p class="mt-8 max-w-[820px] text-[16px] text-[var(--muted)] leading-relaxed">
+        这篇论文不是为了完成一篇 CCF-A，而是希望让更多的"我"在面对那个虚拟号时，<b class="text-[var(--ink)] font-medium">愿意按下接听键</b>。
+        它面向的是开发者、平台规则制定者，也是普通用户 — 让所有人意识到：<b class="text-[var(--ink)] font-medium">无障碍设计不只是一个技术问题，更是一个信任问题</b>。
+      </p>
+      <p class="mt-3 max-w-[820px] text-[16px] text-[var(--muted)] leading-relaxed">
+        论文发表后，研究结论被多家媒体引用，也启发了浙大经济学院等团队后续的"听障骑手定量研究"。它正在变成一个真实的行业讨论。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 设计转化 SilentSpeaker Helmet ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-xs text-[var(--hint)] tracking-[.2em] uppercase">研究 → 设计</span>
+      <span class="chip" style="background:rgba(255,127,78,.1);color:var(--accent);border-color:rgba(255,127,78,.2);">配套设计方案</span>
+    </div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">SilentSpeaker Helmet</h2>
+    <p class="mt-3 text-xl text-[var(--muted)]">为听障骑手设计的"会替他说话"的智能头盔</p>
+    <p class="mt-5 text-[var(--muted)] max-w-[820px] leading-relaxed">
+      论文不止于发现问题。研究中观察到的两个核心痛点 — <b class="text-[var(--ink)] font-medium">"被迫无尊严地暴露身份"</b>与<b class="text-[var(--ink)] font-medium">"沟通低效带来超时"</b> — 让我们意识到，仅靠平台内的工具并不够。
+      于是设计了 <b class="text-[var(--ink)] font-medium">SilentSpeaker Helmet</b>：一个把"按钮 + 语音 + APP"集成在头盔上的硬件 + 软件协同方案。
+    </p>
+  </div>
+
+  <!-- 封面图 -->
+  <div class="reveal">
+    <div class="glass p-3 md:p-4">
+      <img src="../assets/silentspeaker-cover.jpg" alt="SilentSpeaker Helmet 设计概览" loading="lazy" class="w-full h-auto rounded-2xl block" />
+    </div>
+  </div>
+
+  <!-- 痛点 → 解法 -->
+  <div class="grid grid-cols-12 gap-5 mt-8">
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full" style="border-left:3px solid #C2410C;">
+        <div class="text-xs tracking-wider uppercase mb-2" style="color:#C2410C;">痛点 01</div>
+        <h3 class="text-lg font-semibold tracking-tight">无尊严的身份暴露</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          骑手只能用<b class="text-[var(--ink)] font-medium">大声呼喊或夸张肢体动作</b>引起商家、保安注意。在公共场合反复"被迫暴露"自己听障身份，带来心理压力。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-7 h-full" style="border-left:3px solid #C2410C;">
+        <div class="text-xs tracking-wider uppercase mb-2" style="color:#C2410C;">痛点 02</div>
+        <h3 class="text-lg font-semibold tracking-tight">沟通低效 · 超时高发</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          因无法与商家、顾客顺畅沟通，<b class="text-[var(--ink)] font-medium">取餐 / 问路 / 送达</b>每个环节都比普通骑手慢，超时单显著增多，影响收入与评分。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设计核心 -->
+  <div class="grid grid-cols-12 gap-5 mt-8">
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">01</span>
+          <h3 class="text-lg font-semibold tracking-tight">头盔按钮 · 一键说话</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          头盔侧面集成可<b class="text-[var(--ink)] font-medium">自定义语音内容</b>的物理按钮，按一下播放预设的语句（"老板我来取餐"/"快递到了，请开门"），让骑手无需开口也能主动发起沟通。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">02</span>
+          <h3 class="text-lg font-semibold tracking-tight">APP 语音转文字</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          配套 APP 实时把<b class="text-[var(--ink)] font-medium">路人 / 商家 / 顾客的回复</b>转写成文字显示在手机屏幕上，让"听不见"不再是断点，让骑手能跟上对话。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold">03</span>
+          <h3 class="text-lg font-semibold tracking-tight">交通预警 · 安全护盾</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          针对论文里提到的"骑行安全"问题，头盔与 APP 同步检测<b class="text-[var(--ink)] font-medium">车流声 / 警笛 / 喇叭</b>，转化为头盔振动与视觉提醒，降低听障骑手路面风险。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP 流程图 -->
+  <div class="reveal mt-10">
+    <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-3">APP 交互流程</div>
+    <h3 class="text-2xl font-semibold tracking-tight mb-5">三步设置一句你想说的话</h3>
+    <div class="glass p-3 md:p-4">
+      <img src="../assets/silentspeaker-app.jpg" alt="SilentSpeaker APP 交互流程" loading="lazy" class="w-full h-auto rounded-2xl block" />
+    </div>
+    <div class="mt-3 text-xs text-[var(--hint)] text-center">主页 → 选择按钮 → 设置语音内容 · 头盔按下即播放</div>
+  </div>
+
+  <!-- 三个场景 -->
+  <div class="reveal mt-10">
+    <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-3">使用场景</div>
+    <h3 class="text-2xl font-semibold tracking-tight mb-5">从研究痛点 · 到三个真实场景</h3>
+    <div class="glass p-3 md:p-4">
+      <img src="../assets/silentspeaker-scenes.jpg" alt="SilentSpeaker 使用场景" loading="lazy" class="w-full h-auto rounded-2xl block" />
+    </div>
+    <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="rounded-xl bg-white/65 border border-black/5 p-4">
+        <div class="text-xs text-[var(--accent)] tracking-wider uppercase mb-1">场景 ①</div>
+        <div class="text-sm font-medium">取餐</div>
+        <div class="mt-1 text-[12px] text-[var(--hint)] leading-relaxed">用语音替代呼喊，更有尊严地引起商家注意。</div>
+      </div>
+      <div class="rounded-xl bg-white/65 border border-black/5 p-4">
+        <div class="text-xs text-[var(--accent)] tracking-wider uppercase mb-1">场景 ②</div>
+        <div class="text-sm font-medium">问路</div>
+        <div class="mt-1 text-[12px] text-[var(--hint)] leading-relaxed">迷路时一键求助，APP 把路人回复实时转文字。</div>
+      </div>
+      <div class="rounded-xl bg-white/65 border border-black/5 p-4">
+        <div class="text-xs text-[var(--accent)] tracking-wider uppercase mb-1">场景 ③</div>
+        <div class="text-sm font-medium">送达</div>
+        <div class="mt-1 text-[12px] text-[var(--hint)] leading-relaxed">用礼貌语音问候顾客，减少因"无声"造成的差评。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设计哲学 -->
+  <div class="reveal mt-10">
+    <div class="glass p-9">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">设计哲学</div>
+      <h3 class="text-2xl md:text-3xl font-semibold tracking-tight">让骑手"自己决定要不要被听见"</h3>
+      <p class="mt-5 text-[var(--muted)] leading-relaxed text-[16px]">
+        SilentSpeaker 的核心不是"代替听障人群说话"，而是<b class="text-[var(--ink)] font-medium">把"是否暴露身份"的开关交还给他们</b>。
+        他们可以选择按下按钮主动发起沟通，也可以选择保持沉默 — 这正是无障碍设计里最核心的"<b class="text-[var(--ink)] font-medium">尊严感</b>"。
+      </p>
+      <p class="mt-3 text-[var(--muted)] leading-relaxed text-[16px]">
+        这也呼应了我那次"没接电话"的反思：技术真正的温度，不在于多炫的 AI，而在于<b class="text-[var(--ink)] font-medium">让被服务的人保有尊严</b>。
+      </p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============ 反思 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="reveal">
+    <div class="glass p-9 md:p-12">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">反思</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">这项研究教给我什么</h2>
+      <div class="mt-7 grid grid-cols-12 gap-6">
+        <div class="col-span-12 md:col-span-4">
+          <h3 class="text-lg font-semibold">先看见，再设计</h3>
+          <p class="mt-2 text-sm text-[var(--muted)] leading-relaxed">真正的"边缘人群"不是统计学的边缘，是我们日常生活里的盲区。看见他们，是产品设计的第一步。</p>
+        </div>
+        <div class="col-span-12 md:col-span-4">
+          <h3 class="text-lg font-semibold">技术 ≠ 善意</h3>
+          <p class="mt-2 text-sm text-[var(--muted)] leading-relaxed">AI 工具落地的瓶颈往往不在技术本身，而在它如何融入既有的社会信任结构里。</p>
+        </div>
+        <div class="col-span-12 md:col-span-4">
+          <h3 class="text-lg font-semibold">人机协同</h3>
+          <p class="mt-2 text-sm text-[var(--muted)] leading-relaxed">即使最先进的 AI，也仍然需要人类在关键节点的"补位"。这是我后来做 AIGC 产品时的底层信念。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 下一个 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="reveal">
+    <div class="glass p-10 md:p-12 text-center">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">Next</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">回到主页 · 看看其他项目</h2>
+      <p class="mt-4 text-[var(--muted)]">QQ AI 宠物业务、同心结资助系统、花 YOUNG 财富管理。</p>
+      <a href="../index.html" class="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--ink)] text-white text-sm font-medium hover:opacity-90 transition shadow-lg shadow-black/10">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回 Dylan 的主页
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="px-6 pb-12 pt-6 max-w-[1240px] mx-auto flex items-center justify-between text-xs text-[var(--hint)]">
+  <span>© 2026 Dylan Wang · 做有温度的 AI 产品</span>
+  <span>Project · Silent Delivery</span>
+</footer>
+
+</main>
+
+<script>
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); } });
+},{ threshold:.18 });
+document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>同心结 · 山区留守儿童资助系统 | Dylan</title>
+<meta name="description" content="同心结 — 山区留守儿童资助系统小程序，从 0 到 1 的产品设计实践。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:#FAFAF7;
+    --ink:#1B2330;
+    --muted:#5B6573;
+    --hint:#8C95A2;
+    --line:rgba(27,35,48,.08);
+    --glass:rgba(255,255,255,.7);
+    --accent:#FF7F4E;
+    --aurora-1:#DCE3F0;
+    --aurora-2:#E8E0F0;
+    --aurora-3:#FFE8DA;
+  }
+  *{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:"Inter","Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    overflow-x:hidden;
+    letter-spacing:.005em;
+  }
+  .aurora{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    overflow:hidden; filter:blur(80px); opacity:.5;
+  }
+  .aurora::before, .aurora::after, .aurora .blob{
+    content:""; position:absolute; border-radius:50%; will-change:transform;
+  }
+  .aurora::before{
+    width:760px; height:760px; left:-15%; top:-20%;
+    background:radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
+    animation:floatA 32s ease-in-out infinite;
+  }
+  .aurora::after{
+    width:820px; height:820px; right:-20%; top:25%;
+    background:radial-gradient(circle, var(--aurora-2) 0%, transparent 65%);
+    animation:floatB 38s ease-in-out infinite;
+  }
+  .aurora .blob.b1{
+    width:680px; height:680px; left:35%; bottom:-10%;
+    background:radial-gradient(circle, var(--aurora-3) 0%, transparent 65%);
+    animation:floatC 42s ease-in-out infinite;
+  }
+  @keyframes floatA{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,40px)} }
+  @keyframes floatB{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,60px)} }
+  @keyframes floatC{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-50px)} }
+
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(27,35,48,.04),
+      0 8px 32px rgba(27,35,48,.06);
+    border-radius:28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .glass::before{
+    content:""; position:absolute; inset:-1px; border-radius:inherit;
+    background:linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,.4));
+    pointer-events:none; opacity:.5;
+    animation:breath 8s ease-in-out infinite;
+  }
+  @keyframes breath{ 0%,100%{opacity:.4} 50%{opacity:.7} }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px;
+    background:rgba(255,255,255,.65);
+    border:1px solid rgba(27,35,48,.08);
+    font-size:12px; color:var(--muted);
+    backdrop-filter:blur(12px);
+  }
+  .chip{
+    display:inline-flex; align-items:center; padding:4px 10px;
+    border-radius:8px; font-size:11px; color:var(--muted);
+    background:rgba(27,35,48,.04); border:1px solid rgba(27,35,48,.06);
+  }
+  .logo-tile{
+    width:64px; height:64px; border-radius:20px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:600; font-size:16px;
+    background:#F2F0EA; color:#6E5B4A;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,1), 0 8px 24px rgba(27,35,48,.06);
+  }
+  .nav-glass{
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:999px;
+    box-shadow:0 4px 24px rgba(27,35,48,.06);
+  }
+  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in{ opacity:1; transform:none; }
+  ::selection{ background:rgba(255,127,78,.25); }
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(27,35,48,.15); border-radius:4px; }
+
+  .kbd-num{ font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+
+<div class="aurora">
+  <span class="blob b1"></span>
+</div>
+
+<!-- ============ Nav ============ -->
+<nav class="fixed top-5 left-1/2 -translate-x-1/2 z-50 nav-glass px-3 py-2 flex items-center gap-1 text-sm">
+  <a href="../index.html" class="px-3 py-1 rounded-full hover:bg-black/5 transition flex items-center gap-2 text-[var(--ink)]">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span class="font-medium">返回主页</span>
+  </a>
+  <span class="w-px h-4 bg-black/10 mx-1"></span>
+  <span class="px-3 text-[var(--muted)]">Project · 同心结</span>
+</nav>
+
+<main class="relative z-10">
+
+<!-- ============ Hero ============ -->
+<section class="pt-28 pb-16 px-6 max-w-[1240px] mx-auto">
+  <div class="reveal">
+    <div class="flex items-center gap-2 mb-6">
+      <a href="../index.html" class="text-sm text-[var(--muted)] hover:text-[var(--ink)] transition">主页</a>
+      <span class="text-[var(--hint)]">/</span>
+      <span class="text-sm text-[var(--muted)]">公益项目</span>
+      <span class="text-[var(--hint)]">/</span>
+      <span class="text-sm text-[var(--ink)]">同心结</span>
+    </div>
+
+    <!-- 头图横幅 -->
+    <div class="relative rounded-[32px] overflow-hidden border border-black/5 shadow-[0_24px_60px_rgba(27,35,48,.12)]">
+      <img src="../assets/tongxinjie-hero.jpg" alt="同心结主视觉" class="w-full h-[320px] md:h-[420px] object-cover block" />
+      <!-- 顶部 logo + status pill -->
+      <div class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3">
+        <div class="logo-tile" style="background:rgba(255,255,255,.92);color:#6E5B4A;backdrop-filter:blur(12px);">同心</div>
+        <div class="pill" style="background:rgba(255,255,255,.85);"><span class="w-1.5 h-1.5 rounded-full bg-[#22C55E]"></span><span>已上线 · 持续运营中</span></div>
+      </div>
+      <!-- 右上 chip 群 -->
+      <div class="absolute top-6 right-6 md:top-8 md:right-8 hidden md:flex flex-wrap gap-2 justify-end max-w-[320px]">
+        <span class="chip" style="background:rgba(255,255,255,.85);">产品经理</span>
+        <span class="chip" style="background:rgba(255,255,255,.85);">0 → 1 设计</span>
+        <span class="chip" style="background:rgba(255,255,255,.85);">公益</span>
+        <span class="chip" style="background:rgba(255,255,255,.85);">2023</span>
+      </div>
+    </div>
+
+    <!-- 标题区 -->
+    <div class="mt-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div>
+        <h1 class="text-[44px] md:text-[64px] leading-[1.05] font-semibold tracking-tight">同心结</h1>
+        <p class="mt-3 text-xl text-[var(--muted)]">山区留守儿童资助系统 · 微信小程序</p>
+      </div>
+      <div class="md:hidden flex flex-wrap gap-2">
+        <span class="chip">产品经理</span>
+        <span class="chip">0 → 1 设计</span>
+        <span class="chip">公益</span>
+        <span class="chip">2023</span>
+      </div>
+    </div>
+
+    <p class="mt-8 max-w-[780px] text-[17px] text-[var(--muted)] leading-relaxed">
+      把"微信群转账 + Excel 表"的传统资助方式，升级为一个轻量、透明、有温度的小程序。
+      让 120+ 资助人能持续陪伴 100+ 山区儿童成长，让每一笔善款都看得见、每一份成长都被看见。
+    </p>
+  </div>
+</section>
+
+<!-- ============ 关键数据 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 reveal">
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">资助人</div>
+      <div class="kbd-num text-[44px] font-semibold leading-none mt-2">120<span class="text-2xl text-[var(--accent)]">+</span></div>
+      <div class="text-xs text-[var(--hint)] mt-2">长期月捐用户</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">受益儿童</div>
+      <div class="kbd-num text-[44px] font-semibold leading-none mt-2">100<span class="text-2xl text-[var(--accent)]">+</span></div>
+      <div class="text-xs text-[var(--hint)] mt-2">川 · 黔 山区</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">核心模块</div>
+      <div class="kbd-num text-[44px] font-semibold leading-none mt-2">3</div>
+      <div class="text-xs text-[var(--hint)] mt-2">从 0 到 1 设计</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">用户访谈</div>
+      <div class="kbd-num text-[44px] font-semibold leading-none mt-2">2</div>
+      <div class="text-xs text-[var(--hint)] mt-2">资助方 · 管理方</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 项目背景 / 我的角色 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="grid grid-cols-12 gap-5">
+
+    <div class="col-span-12 md:col-span-7 reveal">
+      <div class="glass p-9">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">背景</div>
+        <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">为什么要做同心结</h2>
+        <p class="mt-5 text-[var(--muted)] leading-relaxed">
+          这是一个由志愿者自发运营的儿童资助项目。最早期资助人和儿童的连接，靠的是微信群 + 个人转账 + Excel 表。
+          随着资助规模扩大到 100+ 儿童，<b class="text-[var(--ink)] font-medium">"找不到对应儿童的近况"</b>、
+          <b class="text-[var(--ink)] font-medium">"不知道我的钱花到哪里"</b>、
+          <b class="text-[var(--ink)] font-medium">"管理员每月对账要花几小时"</b> 这些问题集中爆发。
+        </p>
+        <p class="mt-3 text-[var(--muted)] leading-relaxed">
+          原模式无法继续支撑增长，公益项目濒临"想做更多但做不动"的瓶颈。
+        </p>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-5 reveal">
+      <div class="glass p-9 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">我的角色</div>
+        <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">独立 PM</h2>
+        <ul class="mt-5 space-y-3 text-[15px] text-[var(--muted)] leading-relaxed">
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>用户访谈与需求梳理（双端）</div></li>
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>信息架构 · 0 → 1</div></li>
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>原型设计 + 高保真稿</div></li>
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>开发协同与上线推进</div></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 用户研究 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">用户研究</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">两端用户的核心痛点</h2>
+  </div>
+  <div class="grid grid-cols-12 gap-5">
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-8 h-full">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 rounded-2xl bg-[#EDF1F5] text-[#4A6378] flex items-center justify-center text-sm font-medium">资</div>
+          <h3 class="text-xl font-semibold">资助方</h3>
+        </div>
+        <ul class="space-y-3 text-[15px] text-[var(--muted)] leading-relaxed">
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>"我的钱真的花到孩子身上了吗？"<br/><span class="text-xs text-[var(--hint)]">→ 期望资金透明，可查可溯</span></div></li>
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>"想多了解我资助的孩子"<br/><span class="text-xs text-[var(--hint)]">→ 期望持续关系，看到孩子成长</span></div></li>
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>"群消息太多，找不到我对应的孩子"<br/><span class="text-xs text-[var(--hint)]">→ 期望一对一信息聚合</span></div></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-6 reveal">
+      <div class="glass p-8 h-full">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 rounded-2xl bg-[#F4EFE6] text-[#7A6748] flex items-center justify-center text-sm font-medium">管</div>
+          <h3 class="text-xl font-semibold">管理方</h3>
+        </div>
+        <ul class="space-y-3 text-[15px] text-[var(--muted)] leading-relaxed">
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>"对账每月要花一整个周末"<br/><span class="text-xs text-[var(--hint)]">→ 期望自动化财务流水</span></div></li>
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>"新申请儿童的资料要群发给资助人挑"<br/><span class="text-xs text-[var(--hint)]">→ 期望统一展示与匹配池</span></div></li>
+          <li class="flex items-start gap-3"><span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span><div>"信息散在多个 Excel 表里"<br/><span class="text-xs text-[var(--hint)]">→ 期望统一后台管理</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 三大模块 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">解决方案</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">三大核心模块，从 0 到 1</h2>
+    <p class="mt-3 text-[var(--muted)] max-w-[680px]">每个模块都对应着真实痛点的具体解法，而不是堆功能。</p>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">模块 01</div>
+        <h3 class="text-xl font-semibold tracking-tight">透明资金管理</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          月捐 + 流水可视，每一笔捐赠的去向都被记录、被看见。
+        </p>
+        <ul class="mt-5 space-y-2 text-[13px] text-[var(--muted)]">
+          <li>· 财务图表（趋势 / 分类）</li>
+          <li>· 资助流水明细</li>
+          <li>· 月度财报自动生成</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">模块 02</div>
+        <h3 class="text-xl font-semibold tracking-tight">资助关系管理</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          资助人 - 儿童双向匹配池，匹配关系一目了然。
+        </p>
+        <ul class="mt-5 space-y-2 text-[13px] text-[var(--muted)]">
+          <li>· 资助人匹配 / 待匹配</li>
+          <li>· 省份维度统计（川 / 黔）</li>
+          <li>· 资助状态：进行中 / 已结束</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-2">模块 03</div>
+        <h3 class="text-xl font-semibold tracking-tight">温情化儿童互动</h3>
+        <p class="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          不止是数据，更是陪伴。让资助人看见每一份具体的成长。
+        </p>
+        <ul class="mt-5 space-y-2 text-[13px] text-[var(--muted)]">
+          <li>· 成长记录时间轴</li>
+          <li>· 共创涂鸦空间</li>
+          <li>· 节日感谢信</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 视觉展示 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">界面预览</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">小程序主要界面</h2>
+    <p class="mt-3 text-[var(--muted)]">从首页到财务管理，从资助人匹配到儿童成长记录。</p>
+  </div>
+  <div class="reveal">
+    <div class="glass p-4 md:p-8">
+      <div class="rounded-2xl overflow-hidden bg-white/70 border border-black/5 p-3 md:p-5">
+        <img src="../assets/tongxinjie.jpg" alt="同心结小程序界面预览" loading="lazy" class="w-full h-auto rounded-xl block" />
+      </div>
+      <div class="mt-4 text-xs text-[var(--hint)] text-center">从首页 / 资助人匹配 / 财务图表 / 成长记录 / 感谢信 — 完整产品体验</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 项目实景 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">项目实景</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">不止是产品 · 是十年的同行</h2>
+    <p class="mt-3 text-[var(--muted)] max-w-[760px]">小程序只是工具。真正让我感动的，是工具背后这群人 — 资助人、孩子、和一封写了十年的感谢信。</p>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+
+    <!-- 团队合照 -->
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-3">
+        <div class="rounded-2xl overflow-hidden bg-white border border-black/5 aspect-[4/5]">
+          <img src="../assets/tongxinjie-team.png" alt="同心结志愿者与孩子们的合照" loading="lazy" class="w-full h-full object-cover block" />
+        </div>
+        <div class="px-2 pt-3 pb-2">
+          <div class="text-xs text-[var(--accent)] tracking-wider uppercase mb-1">实地探访</div>
+          <h3 class="text-base font-medium">看见这群人</h3>
+          <p class="mt-1 text-xs text-[var(--muted)] leading-relaxed">志愿者带着"同心结"红色横幅走进山里，和孩子们一起留下合影。这是产品功能背后真正服务的人。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 物资发放 -->
+    <div class="col-span-12 md:col-span-4 reveal" style="transition-delay:.06s">
+      <div class="glass p-3">
+        <div class="rounded-2xl overflow-hidden bg-white border border-black/5 aspect-[4/5]">
+          <img src="../assets/tongxinjie-packages.png" alt="同心结资助物资打包发出" loading="lazy" class="w-full h-full object-cover block" />
+        </div>
+        <div class="px-2 pt-3 pb-2">
+          <div class="text-xs text-[var(--accent)] tracking-wider uppercase mb-1">物资发放</div>
+          <h3 class="text-base font-medium">看见这件事</h3>
+          <p class="mt-1 text-xs text-[var(--muted)] leading-relaxed">每一个箱子都贴着"同心结"标签和编号 110 / 113 / 233…，对应小程序里的每一份资助关系。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 感谢信 -->
+    <div class="col-span-12 md:col-span-4 reveal" style="transition-delay:.12s">
+      <div class="glass p-3">
+        <div class="rounded-2xl overflow-hidden bg-white border border-black/5 aspect-[4/5]">
+          <img src="../assets/tongxinjie-letter.png" alt="同心结十周年感谢信" loading="lazy" class="w-full h-full object-cover block" />
+        </div>
+        <div class="px-2 pt-3 pb-2">
+          <div class="text-xs text-[var(--accent)] tracking-wider uppercase mb-1">十周年感谢信</div>
+          <h3 class="text-base font-medium">看见这份信任</h3>
+          <p class="mt-1 text-xs text-[var(--muted)] leading-relaxed">"十年间，没有一个人选择放弃" — 来自同心结发起人在十周年时手写的感谢信。</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 引用感谢信片段 -->
+  <div class="reveal mt-8">
+    <div class="glass p-8 md:p-10" style="border-left:3px solid var(--accent);">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase mb-3">摘自十周年感谢信</div>
+      <blockquote class="text-[17px] md:text-[18px] text-[var(--ink)] leading-relaxed font-medium">
+        "回望 2016 年的春天，我只是萌生了资助一个孩子的小小念头，
+        随手在朋友圈分享了这份心意。未曾想 — 原本我独自帮扶一个孩子的小愿望，
+        在大家的热情簇拥下，变成了守护 23 个孩子的希望。"
+      </blockquote>
+      <p class="mt-5 text-[15px] text-[var(--muted)] leading-relaxed">
+        到 2026 年，这个数字已经超过了 110 位。其中有的孩子走入大学校园，有的已经走上工作岗位，他们带着同心结给予的爱，开启人生的新旅程。
+      </p>
+      <div class="mt-5 text-sm text-[var(--hint)]">同心结发起人 · 2026 年 4 月</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 结果 & 反思 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="grid grid-cols-12 gap-5">
+
+    <div class="col-span-12 md:col-span-7 reveal">
+      <div class="glass p-9 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">结果</div>
+        <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">上线后发生了什么</h2>
+        <ul class="mt-6 space-y-4 text-[15px] text-[var(--muted)] leading-relaxed">
+          <li class="flex items-start gap-3">
+            <span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--accent)] flex-shrink-0"></span>
+            <div><b class="text-[var(--ink)] font-medium">120+ 资助人</b>从微信群迁移到小程序，月捐留存率显著提升。</div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--accent)] flex-shrink-0"></span>
+            <div><b class="text-[var(--ink)] font-medium">管理员对账时间</b>从一个周末压缩到几十分钟。</div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span>
+            <div>新增了"成长记录"和"感谢信"模块后，资助人复访频次明显增加。</div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-[8px] w-1.5 h-1.5 rounded-full bg-[var(--ink)]/40 flex-shrink-0"></span>
+            <div>项目持续运营至今，成为该公益组织的核心数字化基础设施。</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-5 reveal">
+      <div class="glass p-9 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">反思</div>
+        <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">这个项目教给我什么</h2>
+        <p class="mt-5 text-[var(--muted)] text-[15px] leading-relaxed">
+          公益产品的核心不是功能多，而是<b class="text-[var(--ink)] font-medium">让信任可见</b>。
+        </p>
+        <p class="mt-3 text-[var(--muted)] text-[15px] leading-relaxed">
+          每一个图表、每一行流水、每一张成长照片，都是在替"善意"传话。这种克制而具体的产品观，后来一直影响我做 AIGC 产品时的判断。
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 下一个 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="reveal">
+    <div class="glass p-10 md:p-12 text-center">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">Next</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">回到主页 · 看看其他项目</h2>
+      <p class="mt-4 text-[var(--muted)]">QQ AI 宠物业务、CHI'24 听障外卖员研究、花 YOUNG 财富管理。</p>
+      <a href="../index.html" class="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--ink)] text-white text-sm font-medium hover:opacity-90 transition shadow-lg shadow-black/10">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回 Dylan 的主页
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="px-6 pb-12 pt-6 max-w-[1240px] mx-auto flex items-center justify-between text-xs text-[var(--hint)]">
+  <span>© 2026 Dylan Wang · 做有温度的 AI 产品</span>
+  <span>Project · 同心结</span>
+</footer>
+
+</main>
+
+<script>
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); } });
+},{ threshold:.18 });
+document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+</script>
+
+</body>
+</html>

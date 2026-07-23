@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>花 YOUNG · 年轻人财富管理 | Dylan</title>
+<meta name="description" content="花 YOUNG — 面向年轻人的财富管理产品，核心创新「短剧攒」，获 2024 微众银行金融科技大赛亚军。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:#FAFAF7;
+    --ink:#1B2330;
+    --muted:#5B6573;
+    --hint:#8C95A2;
+    --line:rgba(27,35,48,.08);
+    --glass:rgba(255,255,255,.7);
+    --accent:#FF7F4E;
+    --aurora-1:#DCE3F0;
+    --aurora-2:#E8E0F0;
+    --aurora-3:#FFE8DA;
+  }
+  *{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:"Inter","Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    overflow-x:hidden;
+    letter-spacing:.005em;
+  }
+  .aurora{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    overflow:hidden; filter:blur(80px); opacity:.5;
+  }
+  .aurora::before, .aurora::after, .aurora .blob{
+    content:""; position:absolute; border-radius:50%; will-change:transform;
+  }
+  .aurora::before{
+    width:760px; height:760px; left:-15%; top:-20%;
+    background:radial-gradient(circle, var(--aurora-1) 0%, transparent 65%);
+    animation:floatA 32s ease-in-out infinite;
+  }
+  .aurora::after{
+    width:820px; height:820px; right:-20%; top:25%;
+    background:radial-gradient(circle, var(--aurora-2) 0%, transparent 65%);
+    animation:floatB 38s ease-in-out infinite;
+  }
+  .aurora .blob.b1{
+    width:680px; height:680px; left:35%; bottom:-10%;
+    background:radial-gradient(circle, var(--aurora-3) 0%, transparent 65%);
+    animation:floatC 42s ease-in-out infinite;
+  }
+  @keyframes floatA{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,40px)} }
+  @keyframes floatB{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,60px)} }
+  @keyframes floatC{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-50px)} }
+
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(27,35,48,.04),
+      0 8px 32px rgba(27,35,48,.06);
+    border-radius:28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .glass::before{
+    content:""; position:absolute; inset:-1px; border-radius:inherit;
+    background:linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,.4));
+    pointer-events:none; opacity:.5;
+    animation:breath 8s ease-in-out infinite;
+  }
+  @keyframes breath{ 0%,100%{opacity:.4} 50%{opacity:.7} }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px;
+    background:rgba(255,255,255,.65);
+    border:1px solid rgba(27,35,48,.08);
+    font-size:12px; color:var(--muted);
+    backdrop-filter:blur(12px);
+  }
+  .chip{
+    display:inline-flex; align-items:center; padding:4px 10px;
+    border-radius:8px; font-size:11px; color:var(--muted);
+    background:rgba(27,35,48,.04); border:1px solid rgba(27,35,48,.06);
+  }
+  .logo-tile{
+    width:64px; height:64px; border-radius:20px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:15px;
+    background:#EAF0FF; color:#3B5BDB;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,1), 0 8px 24px rgba(27,35,48,.06);
+  }
+  .nav-glass{
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:999px;
+    box-shadow:0 4px 24px rgba(27,35,48,.06);
+  }
+  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in{ opacity:1; transform:none; }
+  ::selection{ background:rgba(255,127,78,.25); }
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(27,35,48,.15); border-radius:4px; }
+
+  .kbd-num{ font-variant-numeric:tabular-nums; }
+
+  /* Lightbox */
+  .lightbox{
+    position:fixed; inset:0; z-index:100;
+    background:rgba(15,22,35,.85);
+    backdrop-filter:blur(20px) saturate(140%);
+    -webkit-backdrop-filter:blur(20px) saturate(140%);
+    display:flex; align-items:center; justify-content:center;
+    padding:5vh 4vw;
+    opacity:0; pointer-events:none;
+    transition:opacity .35s ease;
+    cursor:zoom-out;
+  }
+  .lightbox.open{ opacity:1; pointer-events:auto; }
+  .lightbox img{
+    max-width:100%; max-height:90vh; width:auto; height:auto;
+    border-radius:16px;
+    box-shadow:0 30px 80px rgba(0,0,0,.4);
+    transform:scale(.95); transition:transform .35s cubic-bezier(.2,.7,.2,1);
+  }
+  .lightbox.open img{ transform:scale(1); }
+  .lightbox-close{
+    position:absolute; top:24px; right:24px;
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:background .25s ease;
+  }
+  .lightbox-close:hover{ background:rgba(255,255,255,.25); }
+  .cursor-zoom-in{ cursor:zoom-in; }
+</style>
+</head>
+<body>
+
+<div class="aurora">
+  <span class="blob b1"></span>
+</div>
+
+<!-- ============ Nav ============ -->
+<nav class="fixed top-5 left-1/2 -translate-x-1/2 z-50 nav-glass px-3 py-2 flex items-center gap-1 text-sm">
+  <a href="../index.html" class="px-3 py-1 rounded-full hover:bg-black/5 transition flex items-center gap-2 text-[var(--ink)]">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span class="font-medium">返回主页</span>
+  </a>
+  <span class="w-px h-4 bg-black/10 mx-1"></span>
+  <span class="px-3 text-[var(--muted)]">Project · 花 YOUNG</span>
+</nav>
+
+<main class="relative z-10">
+
+<!-- ============ Hero ============ -->
+<section class="pt-28 pb-16 px-6 max-w-[1240px] mx-auto">
+  <div class="reveal">
+    <div class="flex items-center gap-2 mb-6">
+      <a href="../index.html" class="text-sm text-[var(--muted)] hover:text-[var(--ink)] transition">主页</a>
+      <span class="text-[var(--hint)]">/</span>
+      <span class="text-sm text-[var(--muted)]">金融项目</span>
+      <span class="text-[var(--hint)]">/</span>
+      <span class="text-sm text-[var(--ink)]">花 YOUNG</span>
+    </div>
+
+    <!-- 头图横幅 -->
+    <div class="relative rounded-[32px] overflow-hidden border border-black/5 shadow-[0_24px_60px_rgba(27,35,48,.14)]">
+      <img src="../assets/huayoung-hero.jpg" alt="花 YOUNG 产品主视觉" class="zoomable cursor-zoom-in w-full h-auto block" />
+      <div class="absolute top-6 left-6 md:top-8 md:left-8">
+        <div class="pill" style="background:rgba(255,255,255,.85);"><span class="w-1.5 h-1.5 rounded-full bg-[#FFC857]"></span><span>2024 微众银行金融科技大赛 · 亚军</span></div>
+      </div>
+    </div>
+
+    <!-- 标题区 -->
+    <div class="mt-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="logo-tile">花<br/>Y</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="chip">金融科技</span>
+            <span class="chip">财富管理</span>
+            <span class="chip">竞赛作品 · 亚军</span>
+          </div>
+        </div>
+        <h1 class="text-[40px] md:text-[60px] leading-[1.05] font-semibold tracking-tight">花 YOUNG</h1>
+        <p class="mt-3 text-xl text-[var(--muted)]">面向年轻人的财富管理产品</p>
+      </div>
+    </div>
+
+    <p class="mt-8 max-w-[820px] text-[17px] text-[var(--muted)] leading-relaxed">
+      从<b class="text-[var(--ink)] font-medium">储蓄、投资、消费</b>三个维度，全方位帮年轻用户构建科学、合理、有效的财富管理模式；并搭建理财垂类的社群生态，让攒钱、理财这件"反人性"的事，变得像刷短视频一样轻松、上瘾。
+    </p>
+  </div>
+</section>
+
+<!-- ============ 关键信息 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">奖项</div>
+      <div class="kbd-num text-[32px] font-semibold leading-none mt-2">亚军</div>
+      <div class="text-xs text-[var(--hint)] mt-2">2024 微众银行金融科技大赛</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">目标人群</div>
+      <div class="kbd-num text-[32px] font-semibold leading-none mt-2">年轻人</div>
+      <div class="text-xs text-[var(--hint)] mt-2">大学生 · 职场新人</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">核心维度</div>
+      <div class="kbd-num text-[32px] font-semibold leading-none mt-2">3</div>
+      <div class="text-xs text-[var(--hint)] mt-2">储蓄 · 投资 · 消费</div>
+    </div>
+    <div class="glass p-6">
+      <div class="text-xs text-[var(--hint)] tracking-wider uppercase">核心创新</div>
+      <div class="kbd-num text-[32px] font-semibold leading-none mt-2 text-[var(--accent)]">短剧攒</div>
+      <div class="text-xs text-[var(--hint)] mt-2">无痛攒钱的内容玩法</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 我的角色 + 快速学习 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal grid grid-cols-12 gap-5">
+    <div class="col-span-12 md:col-span-7">
+      <div class="glass p-8 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">陌生领域 · 快速上手</div>
+        <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">初入金融，用产品方法拆解一个新行业</h2>
+        <p class="mt-5 text-[var(--muted)] leading-relaxed">
+          这是我第一次深入<b class="text-[var(--ink)] font-medium">金融理财</b>领域。面对陌生的行业规则和用户，我用一贯的产品方法拆解：先搞清楚"年轻人为什么不理财"——不是没钱，而是<b class="text-[var(--ink)] font-medium">觉得理财枯燥、有门槛、离自己很远</b>；再把这个洞察，翻译成一个"让年轻人愿意开始"的产品。
+        </p>
+        <p class="mt-3 text-[var(--muted)] leading-relaxed">
+          最终方案在 <b class="text-[var(--ink)] font-medium">2024 微众银行金融科技大赛</b>中获得<b class="text-[var(--ink)] font-medium">亚军</b>，也验证了我"快速进入陌生领域、把新知识变成产品能力"的路径是走得通的。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-5">
+      <div class="glass p-8 h-full">
+        <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">面向人群</div>
+        <h3 class="text-xl font-semibold tracking-tight">在校大学生 · 毕业五年内职场新人</h3>
+        <p class="mt-4 text-sm text-[var(--muted)] leading-relaxed">
+          这群人有理财需求，却缺方法、缺习惯、也缺"开始的动力"。他们熟悉短视频、社群、种草文化——所以产品的解法，不是教科书式的理财课，而是把理财<b class="text-[var(--ink)] font-medium">长在他们已有的内容习惯里</b>。
+        </p>
+        <div class="mt-6 space-y-2">
+          <div class="rounded-xl bg-white/65 border border-black/5 px-4 py-3 text-sm">围绕储蓄、投资、消费三个维度做财务管理</div>
+          <div class="rounded-xl bg-white/65 border border-black/5 px-4 py-3 text-sm">面向年轻群体打造理财垂类内容的社交阵地</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 产品概览 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">产品概览</div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">一个把理财"藏进日常"的产品</h2>
+    <p class="mt-3 text-[var(--muted)] max-w-[780px]">从体验金拉新、财富仪表盘，到社群共创、生活服务——花 YOUNG 把储蓄、投资、消费串成一个年轻人愿意每天打开的财富生活入口。</p>
+  </div>
+  <div class="reveal">
+    <div class="glass p-3 md:p-4">
+      <img src="../assets/huayoung-overview.jpg" alt="花 YOUNG 产品概览 — 产品概况 / 面向人群 / 核心特点与主要界面" loading="lazy" class="zoomable cursor-zoom-in w-full h-auto rounded-2xl block" />
+    </div>
+    <div class="mt-3 text-xs text-[var(--hint)] text-center">产品概况 · 面向人群 · 核心特点 · 主要界面（点击查看大图）</div>
+  </div>
+</section>
+
+<!-- ============ 短剧攒 核心创新 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal mb-8">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-xs text-[var(--hint)] tracking-[.2em] uppercase">核心创新</span>
+      <span class="chip" style="background:rgba(255,127,78,.1);color:var(--accent);border-color:rgba(255,127,78,.2);">短剧攒 · Signature</span>
+    </div>
+    <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">短剧攒 · <span style="background:linear-gradient(120deg,#1B2330 10%,#3B4658 55%,#FF7F4E 95%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">让攒钱像追剧一样发生</span></h2>
+    <p class="mt-4 text-[var(--muted)] max-w-[820px] leading-relaxed">
+      年轻人不是不想攒钱，是"攒钱"这个动作太理性、太反人性。我的解法是<b class="text-[var(--ink)] font-medium">把攒钱决策，嵌进他们本来就爱看的短剧切片里</b>——在剧情的关键节点弹出一个和情节呼应的选择，让攒钱在"忍不住想看下一集"的心流中，无痛发生。
+    </p>
+  </div>
+
+  <!-- 视频演示 -->
+  <div class="reveal mb-8">
+    <div class="glass p-4 md:p-6">
+      <div class="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+        <div class="w-full md:w-[300px] flex-shrink-0">
+          <div class="rounded-[28px] overflow-hidden bg-black border border-black/10 shadow-[0_20px_50px_rgba(27,35,48,.18)] mx-auto" style="max-width:280px;">
+            <video
+              src="../assets/huayoung-demo.mp4"
+              controls
+              playsinline
+              preload="metadata"
+              class="w-full h-auto block"
+              style="aspect-ratio:464/960; background:#000;">
+              你的浏览器不支持视频播放，可<a href="../assets/huayoung-demo.mp4">点此下载观看</a>。
+            </video>
+          </div>
+        </div>
+        <div class="flex-1 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 pill mb-4"><span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span><span>产品演示 · 30 秒</span></div>
+          <h3 class="text-2xl font-semibold tracking-tight">先看一眼「短剧攒」长什么样</h3>
+          <p class="mt-3 text-[var(--muted)] leading-relaxed max-w-[520px] md:mx-0 mx-auto">
+            一段真实的产品演示：用户在刷短剧切片时，剧情走到"接不接 offer"的抉择点，页面自然弹出<b class="text-[var(--ink)] font-medium">"接 offer 存 30 / 不接 offer 存 50"</b>——一次点击，攒钱在追剧的心流里悄悄完成。下面是完整的机制拆解。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <div class="glass p-3 md:p-4">
+      <img src="../assets/huayoung-video.jpg" alt="花 YOUNG 短剧攒 — 视频类型 / 视频供给 / 特色玩法与弹窗示意" loading="lazy" class="zoomable cursor-zoom-in w-full h-auto rounded-2xl block" />
+    </div>
+    <div class="mt-3 text-xs text-[var(--hint)] text-center">观看短剧切片时弹出"接 offer 存 30 / 不接 offer 存 50"的选择，触发短剧攒（点击查看大图）</div>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5 mt-8">
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold" style="background:rgba(255,127,78,.15);">01</span>
+          <h3 class="text-lg font-semibold tracking-tight">视频类型</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          初始比重：<b class="text-[var(--ink)] font-medium">理财科普 40% + 短剧切片 40% + 其他类别 20%</b>。再根据用户数据反馈不断优化比例，实现个性化推荐。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center text-xs font-semibold" style="background:rgba(255,127,78,.15);">02</span>
+          <h3 class="text-lg font-semibold tracking-tight">视频供给</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          理财科普：官方团队运营 + 泛财经类自媒体博主入驻；短剧切片：官方运营 + 短剧攒用户自发导出分享；其他类别：用户 UGC 分享。<b class="text-[var(--ink)] font-medium">官方 + 达人 + UGC 三层供给</b>保证内容持续。
+        </p>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-4 reveal">
+      <div class="glass p-7 h-full" style="border:1.5px solid rgba(255,127,78,.35);">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-8 rounded-2xl text-white flex items-center justify-center text-xs font-semibold" style="background:var(--accent);">03</span>
+          <h3 class="text-lg font-semibold tracking-tight">特色玩法 · 无痛攒钱</h3>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">
+          用户观看短剧切片时，随机弹出与剧情呼应的选择页，触发短剧攒玩法；首次选择后弹出玩法说明。并根据用户行为反馈优化弹出次数，实现个性化推荐。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 设计思路 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-16">
+  <div class="reveal">
+    <div class="glass p-9 md:p-11">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">设计思路</div>
+      <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">不改变人性，而是顺着人性设计</h2>
+      <p class="mt-5 text-[var(--muted)] leading-relaxed max-w-[860px]">
+        传统理财产品的做法是"教育用户"——告诉你复利多重要、要延迟满足。但年轻人不缺道理，缺的是"开始的那一下"。花 YOUNG 的核心判断是：<b class="text-[var(--ink)] font-medium">与其对抗人性去说服，不如顺着人性去设计</b>。
+      </p>
+      <p class="mt-3 text-[var(--muted)] leading-relaxed max-w-[860px]">
+        年轻人爱看短剧、爱做选择、爱被剧情牵着走——那就把攒钱变成剧情里的一个选择。用户以为自己在追剧，其实每一次"接 / 不接 offer"的选择，都是在替未来的自己攒下一笔钱。这正是我做 AIGC 产品时一贯的信念：<b class="text-[var(--ink)] font-medium">把一个"需要花力气"的行为，降到"忍不住想做"</b>。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 下一个 ============ -->
+<section class="px-6 max-w-[1240px] mx-auto pb-24">
+  <div class="reveal">
+    <div class="glass p-10 md:p-12 text-center">
+      <div class="text-xs text-[var(--hint)] tracking-[.2em] uppercase mb-3">Next</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">回到主页 · 看看其他项目</h2>
+      <p class="mt-4 text-[var(--muted)]">QQ AI 宠物业务、CHI'24 听障外卖员研究、同心结资助系统。</p>
+      <a href="../index.html" class="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--ink)] text-white text-sm font-medium hover:opacity-90 transition shadow-lg shadow-black/10">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回 Dylan 的主页
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="px-6 pb-12 pt-6 max-w-[1240px] mx-auto flex items-center justify-between text-xs text-[var(--hint)]">
+  <span>© 2026 Dylan Wang</span>
+  <span>Project · 花 YOUNG</span>
+</footer>
+
+</main>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+  <button class="lightbox-close" aria-label="关闭">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<script>
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); } });
+},{ threshold:.14 });
+document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+
+/* Lightbox */
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lightbox-img');
+const lbClose = lb.querySelector('.lightbox-close');
+function openLightbox(src, alt){ lbImg.src = src; lbImg.alt = alt || ''; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+function closeLightbox(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; setTimeout(()=>{ lbImg.src=''; },350); }
+document.querySelectorAll('img.zoomable').forEach(img=>{
+  img.addEventListener('click', ()=> openLightbox(img.currentSrc || img.src, img.alt));
+});
+lb.addEventListener('click', (e)=>{ if(e.target === lbImg) return; closeLightbox(); });
+lbClose.addEventListener('click', closeLightbox);
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && lb.classList.contains('open')) closeLightbox(); });
+</script>
+
+</body>
+</html>
